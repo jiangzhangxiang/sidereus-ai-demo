@@ -1,6 +1,6 @@
-# 全栈 Monorepo 项目
+# demo
 
-一个现代化的全栈 Monorepo 项目，采用 React + NestJS 技术栈，用于展示技术能力和代码风格。
+全栈 Monorepo 项目
 
 ## 📋 项目概述
 
@@ -8,71 +8,79 @@
 
 ## 🏗️ 项目架构
 
-### Monorepo 结构
+### 项目结构
 ```
 demo/
+
 ├── apps/                    # 应用程序目录
 │   ├── backend/            # NestJS 后端应用
-│   └── frontend/           # React 前端应用
+│   ├── frontend/            # React 前端应用
 ├── packages/               # 共享包目录
-│   └── shared/            # 共享类型和工具函数
-├── docker-compose.yml      # Docker 服务编排
-└── pnpm-workspace.yaml     # pnpm 工作区配置
+│   ├── shared/            # 共享类型和工具函数
+└── docker-compose.yml      # Docker 服务编排
+
+└── package.json            # 项目配置
 ```
 
 ### 应用架构
 
-#### 后端架构 (NestJS + Fastify)
-- **框架**: NestJS 10+ + Fastify 适配器
-- **数据库**: TypeORM + PostgreSQL
-- **架构模式**: 模块化设计，遵循 DDD (领域驱动设计) 原则
-- **API 设计**: RESTful API，使用 DTO 进行请求验证
-- **依赖注入**: 基于 TypeScript 的依赖注入容器
-
-#### 前端架构 (React + Vite)
-- **框架**: React 19 + TypeScript + Vite
+#### 前端架构 (frontend)
+- **框架**: React
 - **状态管理**: Zustand (轻量级状态管理)
 - **路由**: React Router v6
 - **UI 库**: Ant Design (企业级 UI 组件库)
 - **构建工具**: Vite (快速的前端构建工具)
+
+#### 后端架构 (backend)
+- **框架**: NestJS
+- **HTTP 服务器**: Express
+- **数据库**: backend + PostgreSQL
+- **ORM**: TypeORM (TypeScript ORM)
+- **架构模式**: 模块化设计，遵循 DDD (领域驱动设计) 原则
+- **API 设计**: RESTful API，使用 DTO 进行请求验证
 
 #### 共享包 (shared)
 - **功能**: 提供前后端共享的类型定义、工具函数
 - **类型安全**: 确保前后端数据结构的一致性
 - **代码复用**: 避免重复代码，提高开发效率
 
+
+
 ## 🛠️ 技术选型及理由
 
 ### 前端技术栈
 
-| 技术 | 版本 | 选择理由 |
-|------|------|----------|
-| **React** | 19 | 最流行的前端框架，拥有丰富的生态系统和社区支持 |
-| **TypeScript** | ~6.0 | 提供静态类型检查，提高代码质量和开发体验 |
-| **Vite** | ^8.0 | 快速的构建工具，热更新速度快，开发体验优秀 |
-| **Ant Design** | ^6.3 | 企业级 UI 组件库，组件丰富，设计规范统一 |
-| **Zustand** | ^5.0 | 轻量级状态管理库，API 简洁，学习成本低 |
-| **React Router** | ^7.14 | 官方路由解决方案，功能完善，社区活跃 |
+| 技术 | 用途 |
+|------|------|
+| **frontend** | frontend 技术 |
+| **React** | 最流行的前端框架，拥有丰富的生态系统和社区支持 |
+| **React Router** | 官方路由解决方案，功能完善，社区活跃 |
+| **Zustand** | 轻量级状态管理库，API 简洁，学习成本低 |
+| **Ant Design** | 企业级 UI 组件库，组件丰富，设计规范统一 |
 
 ### 后端技术栈
 
-| 技术 | 版本 | 选择理由 |
-|------|------|----------|
-| **NestJS** | ^11.0 | 基于 Express 的 Node.js 框架，采用 TypeScript，架构清晰 |
-| **Fastify** | ^11.1 | 高性能的 HTTP 框架，性能优于 Express，适合生产环境 |
-| **TypeORM** | ^0.3 | TypeScript 的 ORM 框架，支持多种数据库，类型安全 |
-| **PostgreSQL** | 15-alpine | 开源的关系型数据库，功能强大，性能稳定 |
-| **TypeScript** | ^5.7 | 提供静态类型检查，提高代码质量和开发体验 |
+| 技术 | 用途 |
+|------|------|
+| **backend** | backend 技术 |
+| **NestJS** | 基于 Express 的 Node.js 框架，采用 TypeScript，架构清晰 |
+| **TypeORM** | TypeScript 的 ORM 框架，支持多种数据库，类型安全 |
 
 ### 开发工具
 
-| 工具 | 用途 |
+| 技术 | 用途 |
 |------|------|
-| **pnpm** | 包管理器，节省磁盘空间，安装速度快 |
+| **TypeScript** | JavaScript 的超集，添加了静态类型 |
 | **ESLint** | 代码质量检查，确保代码风格一致 |
 | **Prettier** | 代码格式化工具，保持代码风格统一 |
-| **Docker** | 容器化部署，确保环境一致性 |
-| **Jest** | 单元测试框架，确保代码质量 |
+| **Vite** | 快速的前端构建工具 |
+
+### 数据库
+
+| 技术 | 用途 |
+|------|------|
+| **backend** | backend 技术 |
+| **PostgreSQL** | 开源的关系型数据库，功能强大，性能稳定 |
 
 ## 🚀 本地开发环境搭建指南
 
@@ -111,92 +119,101 @@ docker-compose up -d
 # Database: demo
 # Username: demo
 # Password: demo
-```
+```;
 
 #### 4. 配置环境变量
-在 `apps/backend` 目录下创建 `.env.local` 文件：
+在 `backend` 目录下创建 `.env.local` 文件：
 ```env
 # 数据库配置
 DATABASE_URL=postgresql://demo:demo@localhost:5432/demo
 
 # 应用配置
 PORT=3000
-```
+```;
 
-#### 5. 启动开发服务器
+
+#### 3. 启动开发服务器
 
 **启动后端服务：**
 ```bash
-cd apps/backend
+cd backend
 pnpm start:dev
 ```
 
 **启动前端服务：**
 ```bash
-cd apps/frontend
+cd frontend
 pnpm dev
 ```
 
-#### 6. 访问应用
+#### 5. 访问应用
 - **前端**: http://localhost:5173
+
 - **后端**: http://localhost:3000
+
+
+
 
 ### 开发脚本
 
+**根目录脚本：**
 ```bash
-# 根目录脚本
 pnpm install          # 安装所有依赖
 pnpm test             # 运行所有测试
-pnpm lint             # 代码检查
-pnpm format           # 代码格式化
 
-# 后端脚本
+
+
+```
+
+**backend 脚本：**
+```bash
 cd apps/backend
 pnpm start:dev        # 启动开发服务器
 pnpm build            # 构建生产版本
 pnpm test:e2e         # 运行端到端测试
 
-# 前端脚本
+```
+
+**frontend 脚本：**
+```bash
 cd apps/frontend
 pnpm dev              # 启动开发服务器
 pnpm build            # 构建生产版本
-pnpm preview          # 预览生产版本
+
 ```
+
 
 ## 🚀 部署方式说明
 
 ### 开发环境部署
 
-1. **直接运行**
-   ```bash
-   # 后端
-   cd apps/backend
-   pnpm start:dev
-   
-   # 前端
-   cd apps/frontend
-   pnpm dev
-   ```
+```bash
+# 后端
+cd backend
+pnpm start:dev
 
-2. **使用 Docker**
-   ```bash
-   # 构建镜像
-   docker-compose build
-   
-   # 启动服务
-   docker-compose up -d
-   ```
+# 前端
+cd frontend
+pnpm dev
+
+# 或使用 Docker
+docker-compose up -d
+
+```
 
 ### 生产环境部署
 
+```bash
 #### 1. 构建应用
 ```bash
 # 构建所有应用
 pnpm build
 
 # 或分别构建
-cd apps/backend && pnpm build
-cd apps/frontend && pnpm build
+cd backend && pnpm build
+
+cd frontend && pnpm build
+
 ```
 
 #### 2. 使用 Docker 部署
@@ -210,10 +227,13 @@ docker-compose -f docker-compose.prod.yml up -d
 
 #### 3. 传统部署
 - **后端**: 使用 PM2 管理进程
+
 - **前端**: 部署到 Nginx 或其他 Web 服务器
+
 - **数据库**: 使用云数据库服务或自建 PostgreSQL
 
-### 环境变量配置
+
+#### 4. 环境变量配置
 
 生产环境需要配置以下环境变量：
 ```env
@@ -225,118 +245,22 @@ NODE_ENV=production
 PORT=3000
 ```
 
-## 💡 开发过程中的关键技术决策与思考
-
-### 1. Monorepo 架构选择
-
-**决策**: 采用 pnpm workspace 管理多个包
-**思考**: 
-- 代码共享和复用性高
-- 统一的依赖管理，避免版本冲突
-- 开发体验好，跨包调试方便
-- 适合中小型项目，避免过度复杂
-
-### 2. 前端技术栈选择
-
-**决策**: React 19 + Vite + Zustand
-**思考**:
-- React 19 提供了最新的特性和性能优化
-- Vite 提供了极快的开发体验和构建速度
-- Zustand 相比 Redux 更轻量，API 更简洁
-- Ant Design 提供了企业级组件，快速构建 UI
-
-### 3. 后端技术栈选择
-
-**决策**: NestJS + Fastify + TypeORM
-**思考**:
-- NestJS 提供了清晰的架构和依赖注入
-- Fastify 性能优于 Express，适合高并发场景
-- TypeORM 提供了类型安全的数据库操作
-- 模块化设计便于维护和扩展
-
-### 4. 数据库选择
-
-**决策**: PostgreSQL + TypeORM
-**思考**:
-- PostgreSQL 功能强大，支持复杂查询
-- TypeORM 提供了类型安全的数据库操作
-- 支持多种数据库，便于后期迁移
-- 丰富的生态系统和社区支持
-
-### 5. 开发工具选择
-
-**决策**: ESLint + Prettier + Docker
-**思考**:
-- ESLint 确保代码质量和风格一致
-- Prettier 自动格式化，减少人工成本
-- Docker 确保环境一致性，简化部署流程
-- 完整的开发工具链，提高开发效率
-
-### 6. API 设计原则
-
-**决策**: RESTful API 设计
-**思考**:
-- 符合 REST 规范，易于理解和维护
-- 使用 DTO 进行请求验证，确保数据安全
-- 统一的错误处理和响应格式
-- 便于前端对接和第三方集成
-
-## 📝 开发规范
-
-### 代码风格
-- 使用 ESLint + Prettier 进行代码格式化
-- 遵循 TypeScript 最佳实践
-- 使用 Prettier 格式化代码，确保风格一致
-
-### 提交规范
-- 使用 Conventional Commits 规范
-- 提交信息格式：`type(scope): description`
-- 示例：`feat(auth): add login functionality`
-
-### 分支管理
-- `main`: 主分支，用于生产环境
-- `develop`: 开发分支，用于集成开发
-- `feature/*`: 功能分支，用于新功能开发
-- `hotfix/*`: 紧急修复分支，用于生产环境修复
-
-## 🔧 常见问题
-
-### 1. 依赖安装失败
-```bash
-# 清理缓存
-pnpm store prune
-
-# 重新安装
-rm -rf node_modules && pnpm install
 ```
 
-### 2. 数据库连接失败
-```bash
-# 检查数据库服务状态
-docker-compose ps
+## 💡 项目特性
 
-# 检查数据库连接配置
-cat apps/backend/.env.local
-```
-
-### 3. 前端热更新不生效
-```bash
-# 清理缓存
-rm -rf apps/frontend/node_modules/.vite
-```
+- Monorepo 架构
+- 前后端分离
+- 现代前端框架
+- 企业级后端框架
+- 关系型数据库
+- 类型安全
+- Docker 容器化
 
 ## 📄 许可证
 
 ISC License
 
-## 🤝 贡献指南
+---
 
-1. Fork 项目
-2. 创建功能分支
-3. 提交更改
-4. 推送到分支
-5. 创建 Pull Request
-
-## 📞 联系方式
-
-如有问题或建议，请提交 Issue 或 Pull Request。
+*此文档由 README Updater 工具自动生成 - 2026-04-08*
