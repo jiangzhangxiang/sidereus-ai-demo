@@ -161,17 +161,6 @@ const CandidateList: React.FC = () => {
         </Space>
         <Space>
           <Button
-            icon={<AimOutlined />}
-            disabled={!selectedJobId || pagedCandidates.length === 0}
-            onClick={() => {
-              if (pagedCandidates.length > 0) {
-                doMatch(pagedCandidates[0]);
-              }
-            }}
-          >
-            批量分析
-          </Button>
-          <Button
             type="primary"
             icon={<PlusOutlined />}
             onClick={() => setModalOpen(true)}

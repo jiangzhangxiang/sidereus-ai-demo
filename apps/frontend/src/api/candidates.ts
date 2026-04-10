@@ -8,7 +8,7 @@
 import type { Candidate, FilterState } from '@demo/shared';
 
 /** 后端 API 基础地址 */
-const API_BASE_URL = 'http://localhost:3000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
 /** 分页响应通用结构 */
 export interface PaginatedResponse<T> {

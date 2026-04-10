@@ -7,7 +7,7 @@
  */
 import type { MatchRequest, MatchResult } from '@demo/shared';
 
-const API_BASE_URL = 'http://localhost:3000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
 export async function analyzeMatch(data: MatchRequest): Promise<MatchResult> {
   const response = await fetch(`${API_BASE_URL}/api/match`, {

@@ -36,7 +36,7 @@ import { Job } from './jobs/job.entity';
         password: config.get('DB_PASSWORD'),
         database: config.get('DB_DATABASE'),
         entities: [Candidate, Education, WorkExperience, Job],
-        synchronize: true,
+        synchronize: process.env.NODE_ENV === 'development',
       }),
     }),
     FileUploadModule,
