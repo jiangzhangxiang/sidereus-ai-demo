@@ -106,8 +106,7 @@ temp/
 .dockerignore
 
 # Monorepo specific
-# pnpm workspace lock file (if not committed)
-pnpm-lock.yaml
+# pnpm workspace lock file (committed for consistency)
 
 # Local development files
 *.local
