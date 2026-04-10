@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: demo-postgres
+    environment:
+      POSTGRES_USER: demo
+      POSTGRES_PASSWORD: demo_prod_2026
+      POSTGRES_DB: demo
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - demo-network
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U demo"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: demo-backend
+    env_file:
+      - apps/backend/.env.local
+    environment:
+      DB_HOST: postgres
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - demo-network
+    restart: always
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+      args:
+        VITE_API_BASE_URL: http://115.29.195.88:3000
+    container_name: demo-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - demo-network
+    restart: always
+
+volumes:
+  postgres_data:
+
+networks:
+  demo-network:
+    driver: bridge

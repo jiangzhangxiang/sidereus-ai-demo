@@ -1,0 +1,22 @@
+FROM node:20-alpine AS base
+
+FROM base AS builder
+WORKDIR /app
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/backend/package.json ./apps/backend/
+COPY packages/shared/package.json ./packages/shared/
+RUN corepack enable && corepack prepare pnpm@10.32.1 --activate && \
+    pnpm install --frozen-lockfile
+COPY . .
+RUN pnpm --filter backend build
+
+FROM base AS production
+WORKDIR /app
+RUN addgroup -g 1001 -S nestjs && \
+    adduser -S nestjs -u 1001 -G nestjs
+COPY --from=builder /app/apps/backend/dist ./dist
+COPY --from=builder /app/apps/backend/package.json ./
+COPY --from=builder /app/node_modules ./node_modules
+USER nestjs
+EXPOSE 3000
+CMD ["node", "dist/main"]
