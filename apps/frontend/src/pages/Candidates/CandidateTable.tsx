@@ -1,16 +1,15 @@
 /**
  * @fileoverview 候选人表格组件
  * @description 以 Ant Design Table 形式展示候选人列表，包含姓名、联系方式、技能标签、评分、
- *              状态、上传时间和操作列。支持排序和行点击跳转。
+ *              状态、上传时间和操作列。支持排序、行点击跳转和状态流转操作。
  * @module pages/Candidates/CandidateTable
- * @version 1.0.0
+ * @version 2.0.0
  */
 import React from 'react';
-import { Tag } from 'antd';
+import { Tag, Button, Modal, message, Space, Table } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
 import {
-  EyeOutlined,
   MailOutlined,
   PhoneOutlined,
   EnvironmentOutlined,
@@ -23,18 +22,49 @@ import {
   CandidateStatusLabels,
   CandidateStatusColors,
 } from '@demo/shared';
+import { updateCandidateStatus } from '../../api/candidates';
 
 /** 候选人表格 Props 接口 */
 interface CandidateTableProps {
   candidates: Candidate[];
+  onRefresh?: () => void;
 }
 
 const statusLabels = CandidateStatusLabels;
 const statusColors = CandidateStatusColors;
 
+/** 状态流转规则：定义每个状态的下一个可执行状态 */
+const statusFlowMap: Record<CandidateStatus, CandidateStatus | null> = {
+  pending: 'screened',
+  screened: 'interviewing',
+  interviewing: 'hired',
+  hired: null,
+  rejected: 'pending',
+};
+
 /** 候选人表格组件 */
-const CandidateTable: React.FC<CandidateTableProps> = ({ candidates }) => {
+const CandidateTable: React.FC<CandidateTableProps> = ({ candidates, onRefresh }) => {
   const navigate = useNavigate();
+
+  const handleStatusChange = async (record: Candidate, newStatus: CandidateStatus) => {
+    Modal.confirm({
+      title: '确认状态变更',
+      content: `确定要将「${record.basicInfo.name}」的状态从「${statusLabels[record.status]}」变更为「${statusLabels[newStatus]}」吗？`,
+      okText: '确认',
+      cancelText: '取消',
+      onOk: async () => {
+        try {
+          await updateCandidateStatus(record.id, newStatus);
+          message.success(`状态已更新为：${statusLabels[newStatus]}`);
+          if (onRefresh) {
+            onRefresh();
+          }
+        } catch (error: any) {
+          message.error(error.message || '状态更新失败');
+        }
+      },
+    });
+  };
 
   const columns: ColumnsType<Candidate> = [
     {
@@ -97,7 +127,6 @@ const CandidateTable: React.FC<CandidateTableProps> = ({ candidates }) => {
       dataIndex: 'score',
       key: 'score',
       width: 100,
-      sorter: true,
       render: (score: number) => (
         <span
           style={{
@@ -122,7 +151,6 @@ const CandidateTable: React.FC<CandidateTableProps> = ({ candidates }) => {
         { text: '已录用', value: 'hired' },
         { text: '已淘汰', value: 'rejected' },
       ],
-      onFilter: () => true,
       render: (status: CandidateStatus) => (
         <Tag color={statusColors[status]}>{statusLabels[status]}</Tag>
       ),
@@ -132,27 +160,53 @@ const CandidateTable: React.FC<CandidateTableProps> = ({ candidates }) => {
       dataIndex: 'uploadedAt',
       key: 'uploadedAt',
       width: 160,
-      sorter: true,
       render: (date: string) =>
         new Date(date).toLocaleString('zh-CN'),
     },
     {
       title: '操作',
       key: 'action',
-      width: 80,
+      width: 200,
       fixed: 'right',
-      render: (_, record) => (
-        <a
-          onClick={() => navigate(`/candidates/${record.id}`)}
-          style={{ color: '#1677ff' }}
-        >
-          <EyeOutlined /> 详情
-        </a>
-      ),
+      render: (_, record) => {
+        const nextStatus = statusFlowMap[record.status];
+        return (
+          <Space size="small">
+            <a
+              onClick={() => navigate(`/candidates/${record.id}`)}
+              style={{ color: '#1677ff' }}
+            >
+              详情
+            </a>
+            {nextStatus && (
+              <Button
+                type="link"
+                size="small"
+                onClick={() => handleStatusChange(record, nextStatus)}
+                style={{
+                  color: statusColors[nextStatus] === 'success' ? '#52c41a' : 
+                         statusColors[nextStatus] === 'processing' ? '#1677ff' :
+                         statusColors[nextStatus] === 'warning' ? '#faad14' : '#999',
+                  paddingLeft: 0,
+                }}
+              >
+                {statusLabels[nextStatus]}
+              </Button>
+            )}
+          </Space>
+        );
+      },
     },
   ];
 
-  return null;
+  return (
+    <Table
+      dataSource={candidates}
+      columns={columns}
+      rowKey="id"
+      pagination={false}
+    />
+  );
 };
 
 export default CandidateTable;

@@ -19,7 +19,7 @@ import BasicInfoCard from './BasicInfoCard';
 import ScoreBreakdownCard from './ScoreBreakdownCard';
 import EducationCard from './EducationCard';
 import WorkExperienceCard from './WorkExperienceCard';
-import PdfPreviewCard from './PdfPreviewCard';
+
 import type { Candidate } from '@demo/shared';
 
 const { Title, Paragraph } = Typography;
@@ -174,10 +174,6 @@ const CandidateDetail: React.FC = () => {
 
           <div style={{ marginTop: 20 }} />
 
-          <PdfPreviewCard
-            resumeUrl={candidate.resumeUrl}
-            candidateName={candidate.basicInfo.name}
-          />
         </Col>
 
         <Col xs={24} lg={8}>

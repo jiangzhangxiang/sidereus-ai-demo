@@ -131,3 +131,30 @@ export async function deleteCandidate(id: string): Promise<void> {
     throw new Error('删除候选人失败');
   }
 }
+
+/**
+ * 更新候选人状态
+ * @param id - 候选人 UUID
+ * @param status - 新状态
+ * @param reason - 变更原因（可选）
+ * @returns 更新后的候选人对象
+ * @throws Error - 请求失败或状态转换不合法时抛出
+ */
+export async function updateCandidateStatus(
+  id: string,
+  status: string,
+  reason?: string,
+): Promise<Candidate> {
+  const response = await fetch(`${API_BASE_URL}/api/candidates/${id}/status`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status, reason }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || '更新候选人状态失败');
+  }
+
+  return response.json();
+}

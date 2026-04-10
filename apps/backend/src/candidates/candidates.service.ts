@@ -5,13 +5,14 @@
  * @module candidates/candidates.service
  * @version 1.0.0
  */
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like, In } from 'typeorm';
 import { plainToInstance } from 'class-transformer';
 import { Candidate } from './candidate.entity';
 import { Education } from './education.entity';
 import { WorkExperience } from './work-experience.entity';
+import { UpdateStatusDto } from './dto/update-status.dto';
 
 /** 分页查询参数接口 */
 interface FindAllOptions {
@@ -58,7 +59,7 @@ export class CandidatesService {
 
     if (search) {
       queryBuilder.andWhere(
-        "candidate.basicInfo->>'name' ILIKE :search OR candidate.basicInfo->>'phone' ILIKE :search OR candidate.basicInfo->>'email' ILIKE :search",
+        'candidate."basicInfo"->>\'name\' ILIKE :search OR candidate."basicInfo"->>\'phone\' ILIKE :search OR candidate."basicInfo"->>\'email\' ILIKE :search',
         { search: `%${search}%` },
       );
     }
@@ -182,5 +183,38 @@ export class CandidatesService {
       throw new NotFoundException(`候选人 ID ${id} 不存在`);
     }
     await this.candidateRepository.remove(candidate);
+  }
+
+  private readonly statusFlowMap: Record<string, string[]> = {
+    pending: ['screened'],
+    screened: ['interviewing'],
+    interviewing: ['hired'],
+    hired: [],
+    rejected: ['pending'],
+  };
+
+  async updateStatus(id: string, updateStatusDto: UpdateStatusDto): Promise<any> {
+    const candidate = await this.findOne(id);
+    if (!candidate) {
+      throw new NotFoundException(`候选人 ID ${id} 不存在`);
+    }
+
+    const { status: newStatus } = updateStatusDto;
+    const currentStatus = candidate.status;
+
+    if (currentStatus === newStatus) {
+      throw new BadRequestException(`候选人当前状态已是 ${newStatus}，无需更新`);
+    }
+
+    const allowedTransitions = this.statusFlowMap[currentStatus] || [];
+    if (!allowedTransitions.includes(newStatus)) {
+      throw new BadRequestException(
+        `不允许从 ${currentStatus} 状态转换到 ${newStatus} 状态。允许的转换：${allowedTransitions.join(', ') || '无'}`,
+      );
+    }
+
+    candidate.status = newStatus;
+    const updatedCandidate = await this.candidateRepository.save(candidate);
+    return plainToInstance(Candidate, updatedCandidate);
   }
 }

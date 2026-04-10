@@ -10,6 +10,7 @@ import {
   Get,
   Post,
   Put,
+  Patch,
   Delete,
   Body,
   Param,
@@ -21,6 +22,7 @@ import {
 } from '@nestjs/common';
 import { CandidatesService } from './candidates.service';
 import { CreateCandidateDto, UpdateCandidateDto } from './dto/create-candidate.dto';
+import { UpdateStatusDto } from './dto/update-status.dto';
 
 @Controller('api/candidates')
 export class CandidatesController {
@@ -107,5 +109,14 @@ export class CandidatesController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.candidatesService.remove(id);
+  }
+
+  @Patch(':id/status')
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  async updateStatus(
+    @Param('id') id: string,
+    @Body() updateStatusDto: UpdateStatusDto,
+  ) {
+    return this.candidatesService.updateStatus(id, updateStatusDto);
   }
 }
