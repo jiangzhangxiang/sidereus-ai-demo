@@ -66,6 +66,27 @@ clone_project() {
     echo "✅ 项目代码准备完成"
 }
 
+configure_docker_mirror() {
+    echo ""
+    echo "🐳 [3.5/6] 配置 Docker 镜像加速..."
+
+    mkdir -p /etc/docker
+
+    cat > /etc/docker/daemon.json << 'EOF'
+{
+  "registry-mirrors": [
+    "https://docker.1ms.run",
+    "https://docker.xuanyuan.me",
+    "https://dockerpull.org"
+  ]
+}
+EOF
+
+    systemctl restart docker > /dev/null 2>&1
+
+    echo "✅ Docker 镜像加速器配置完成"
+}
+
 configure_env() {
     echo ""
     echo "⚙️  [3/6] 配置环境变量..."
@@ -163,6 +184,7 @@ main() {
     check_root
     install_dependencies
     clone_project
+    configure_docker_mirror
     configure_env
     build_and_start
     start_services
