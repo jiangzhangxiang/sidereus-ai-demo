@@ -21,7 +21,10 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { CandidatesService } from './candidates.service';
-import { CreateCandidateDto, UpdateCandidateDto } from './dto/create-candidate.dto';
+import {
+  CreateCandidateDto,
+  UpdateCandidateDto,
+} from './dto/create-candidate.dto';
 import { UpdateStatusDto } from './dto/update-status.dto';
 
 @Controller('api/candidates')
@@ -98,7 +101,10 @@ export class CandidatesController {
    */
   @Put(':id')
   @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
-  update(@Param('id') id: string, @Body() updateCandidateDto: UpdateCandidateDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateCandidateDto: UpdateCandidateDto,
+  ) {
     return this.candidatesService.update(id, updateCandidateDto);
   }
 

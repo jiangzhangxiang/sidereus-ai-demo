@@ -1,4 +1,4 @@
- import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Tag, Button, Space, Table } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
@@ -6,7 +6,7 @@ import {
   MailOutlined,
   PhoneOutlined,
   EnvironmentOutlined,
-  EditOutlined,
+  AimOutlined,
 } from '@ant-design/icons';
 import type {
   Candidate,
@@ -20,13 +20,19 @@ import StatusChangeModal from './StatusChangeModal';
 
 interface CandidateTableProps {
   candidates: Candidate[];
+  selectedJobId?: string;
   onRefresh?: () => void;
+  onMatch: (candidate: Candidate) => void;
 }
 
 const statusLabels = CandidateStatusLabels;
 const statusColors = CandidateStatusColors;
 
-const CandidateTable: React.FC<CandidateTableProps> = ({ candidates, onRefresh }) => {
+const CandidateTable: React.FC<CandidateTableProps> = ({
+  candidates,
+  onRefresh,
+  onMatch,
+}) => {
   const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState<Candidate | null>(null);
@@ -129,7 +135,7 @@ const CandidateTable: React.FC<CandidateTableProps> = ({ candidates, onRefresh }
     {
       title: '操作',
       key: 'action',
-      width: 200,
+      width: 240,
       fixed: 'right',
       render: (_, record) => (
         <Space size="small">
@@ -146,6 +152,15 @@ const CandidateTable: React.FC<CandidateTableProps> = ({ candidates, onRefresh }
             style={{ paddingLeft: 0 }}
           >
             修改状态
+          </Button>
+          <Button
+            type="link"
+            size="small"
+            icon={<AimOutlined />}
+            onClick={() => onMatch(record)}
+            style={{ paddingLeft: 0, color: '#722ed1' }}
+          >
+            匹配分析
           </Button>
         </Space>
       ),

@@ -163,3 +163,44 @@ export interface FilterState {
   /** 已选状态标签 */
   selectedStatuses: CandidateStatus[];
 }
+
+/** 岗位数据模型 */
+export interface Job {
+  id: string;
+  title: string;
+  description: string;
+  required_skills: string[];
+  plus_skills: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+/** 匹配维度评分接口 */
+export interface MatchDimensions {
+  skill_match: number;
+  experience_relevance: number;
+  education_fit: number;
+}
+
+/** 匹配分析结果接口 */
+export interface MatchResult {
+  overall_score: number;
+  dimensions: MatchDimensions;
+  comment: string;
+}
+
+/** 匹配请求接口（前端发送给后端） */
+export interface MatchRequest {
+  job: {
+    title: string;
+    description: string;
+    required_skills: string[];
+    plus_skills?: string[];
+  };
+  candidate: {
+    basicInfo: CandidateBasicInfo;
+    skills?: string[];
+    workExperience?: WorkExperience[];
+    education?: Education[];
+  };
+}

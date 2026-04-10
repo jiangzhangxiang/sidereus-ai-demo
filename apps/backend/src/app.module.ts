@@ -1,7 +1,7 @@
 /**
  * @fileoverview 应用根模块
  * @description NestJS 应用入口模块，负责全局配置：环境变量加载、PostgreSQL 数据库连接、
- *              子模块注册（FileUploadModule、CandidatesModule）及全局服务提供者。
+ *              子模块注册（FileUploadModule、CandidatesModule、JobsModule、MatchModule）及全局服务提供者。
  * @module app.module
  * @version 1.0.0
  */
@@ -12,9 +12,12 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { FileUploadModule } from './file-upload/file-upload.module';
 import { CandidatesModule } from './candidates/candidates.module';
+import { JobsModule } from './jobs/jobs.module';
+import { MatchModule } from './match/match.module';
 import { Candidate } from './candidates/candidate.entity';
 import { Education } from './candidates/education.entity';
 import { WorkExperience } from './candidates/work-experience.entity';
+import { Job } from './jobs/job.entity';
 
 @Module({
   imports: [
@@ -32,12 +35,14 @@ import { WorkExperience } from './candidates/work-experience.entity';
         username: config.get('DB_USERNAME'),
         password: config.get('DB_PASSWORD'),
         database: config.get('DB_DATABASE'),
-        entities: [Candidate, Education, WorkExperience],
+        entities: [Candidate, Education, WorkExperience, Job],
         synchronize: true,
       }),
     }),
     FileUploadModule,
     CandidatesModule,
+    JobsModule,
+    MatchModule,
   ],
   controllers: [AppController],
   providers: [AppService],

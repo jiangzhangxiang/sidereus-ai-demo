@@ -173,8 +173,7 @@ export class ResumeParserService {
 
         try {
           const parsed = JSON.parse(data);
-          const content =
-            parsed.choices?.[0]?.delta?.content || '';
+          const content = parsed.choices?.[0]?.delta?.content || '';
           if (content) {
             yield `data: ${JSON.stringify({ type: 'token', data: content })}\n\n`;
           }

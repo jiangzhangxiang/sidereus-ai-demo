@@ -52,8 +52,7 @@ const seedData = [
         company: '阿里巴巴',
         position: '前端开发工程师',
         period: '2019-07 - 2022-06',
-        description:
-          '参与淘宝商家后台系统开发，负责组件库建设和工程化体系建设',
+        description: '参与淘宝商家后台系统开发，负责组件库建设和工程化体系建设',
       },
     ],
     skills: ['React', 'TypeScript', 'Node.js', 'Webpack', '性能优化'],

@@ -5,7 +5,11 @@
  * @module candidates/candidates.service
  * @version 1.0.0
  */
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like, In } from 'typeorm';
 import { plainToInstance } from 'class-transformer';
@@ -75,10 +79,15 @@ export class CandidatesService {
     }
 
     const validSortFields = ['score', 'uploadedAt'];
-    const sortField = validSortFields.includes(sortBy || '') ? sortBy : 'uploadedAt';
-    
+    const sortField = validSortFields.includes(sortBy || '')
+      ? sortBy
+      : 'uploadedAt';
+
     queryBuilder
-      .orderBy(`candidate.${sortField}`, sortOrder?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC')
+      .orderBy(
+        `candidate.${sortField}`,
+        sortOrder?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC',
+      )
       .skip((page - 1) * pageSize)
       .take(pageSize);
 
@@ -162,7 +171,8 @@ export class CandidatesService {
     if (workExperience !== undefined) {
       await this.workExperienceRepository.delete({ candidate: { id } });
       if (workExperience.length > 0) {
-        const workEntities = this.workExperienceRepository.create(workExperience);
+        const workEntities =
+          this.workExperienceRepository.create(workExperience);
         workEntities.forEach((work: any) => (work.candidate = candidate));
         candidate.workExperience = workEntities;
       }
@@ -185,7 +195,10 @@ export class CandidatesService {
     await this.candidateRepository.remove(candidate);
   }
 
-  async updateStatus(id: string, updateStatusDto: UpdateStatusDto): Promise<any> {
+  async updateStatus(
+    id: string,
+    updateStatusDto: UpdateStatusDto,
+  ): Promise<any> {
     const candidate = await this.findOne(id);
     if (!candidate) {
       throw new NotFoundException(`候选人 ID ${id} 不存在`);
@@ -195,7 +208,9 @@ export class CandidatesService {
     const currentStatus = candidate.status;
 
     if (currentStatus === newStatus) {
-      throw new BadRequestException(`候选人当前状态已是 ${newStatus}，无需更新`);
+      throw new BadRequestException(
+        `候选人当前状态已是 ${newStatus}，无需更新`,
+      );
     }
 
     candidate.status = newStatus;

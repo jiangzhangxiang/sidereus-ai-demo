@@ -5,7 +5,17 @@
  * @module candidates/dto/create-candidate.dto
  * @version 1.0.0
  */
-import { IsString, IsOptional, IsArray, IsNumber, IsEnum, ValidateNested, IsObject, Min, Max } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsArray,
+  IsNumber,
+  IsEnum,
+  ValidateNested,
+  IsObject,
+  Min,
+  Max,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 /** 基本信息数据传输对象 */

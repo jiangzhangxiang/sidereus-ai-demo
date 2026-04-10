@@ -65,8 +65,7 @@ export class FileUploadController {
 
         res.end();
       } else {
-        const resumeData =
-          await this.resumeParserService.parseResume(pdfText);
+        const resumeData = await this.resumeParserService.parseResume(pdfText);
         res.status(200).json(resumeData);
       }
     } catch (error) {
