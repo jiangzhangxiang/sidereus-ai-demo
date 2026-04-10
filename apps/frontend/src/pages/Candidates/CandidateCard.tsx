@@ -1,9 +1,15 @@
+/**
+ * @fileoverview 候选人卡片组件
+ * @description 以卡片形式展示候选人核心信息，包括姓名、城市、联系方式、评分（带颜色编码）、
+ *              状态标签、技能列表和最近一段工作经历。点击卡片可跳转到详情页。
+ * @module pages/Candidates/CandidateCard
+ * @version 1.0.0
+ */
 import React from 'react';
 import { Card, Tag, Progress } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import {
   EyeOutlined,
-  MailOutlined,
   PhoneOutlined,
   EnvironmentOutlined,
   StarFilled,
@@ -17,6 +23,7 @@ import {
   CandidateStatusColors,
 } from '@demo/shared';
 
+/** 候选人卡片 Props 接口 */
 interface CandidateCardProps {
   candidate: Candidate;
 }
@@ -24,6 +31,7 @@ interface CandidateCardProps {
 const statusLabels = CandidateStatusLabels;
 const statusColors = CandidateStatusColors;
 
+/** 根据评分值返回对应颜色 */
 const getScoreColor = (score: number): string => {
   if (score >= 90) return '#52c41a';
   if (score >= 80) return '#1677ff';
@@ -31,6 +39,7 @@ const getScoreColor = (score: number): string => {
   return '#ff4d4f';
 };
 
+/** 候选人卡片组件 */
 const CandidateCard: React.FC<CandidateCardProps> = ({ candidate }) => {
   const navigate = useNavigate();
 

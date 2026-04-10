@@ -1,51 +1,54 @@
+/**
+ * @fileoverview 候选人全局状态管理（Zustand Store）
+ * @description 使用 Zustand 管理候选人列表的全局状态，包括数据加载、分页、筛选、视图切换等功能。
+ *              作为前端与后端 API 交互的中间层，统一管理候选人数据的获取和更新。
+ * @module store/candidateStore
+ * @version 1.0.0
+ */
 import { create } from 'zustand';
-import type {
-  Candidate,
-  CandidateStatus,
-  FilterState,
-  StatusHistoryRecord,
-  ViewMode,
-} from '@demo/shared';
+import type { Candidate, FilterState, ViewMode } from '@demo/shared';
 import {
   fetchCandidates,
   createCandidate as apiCreateCandidate,
-  updateCandidate as apiUpdateCandidate,
-  deleteCandidate as apiDeleteCandidate,
 } from '../api/candidates';
 
+/** 候选人状态管理接口定义 */
 interface CandidateStore {
+  /** 候选人列表数据 */
   candidates: Candidate[];
-  statusHistory: StatusHistoryRecord[];
+  /** 当前视图模式（表格/卡片） */
   viewMode: ViewMode;
+  /** 筛选条件集合 */
   filter: FilterState;
+  /** 当前页码 */
   currentPage: number;
+  /** 每页记录数 */
   pageSize: number;
+  /** 总记录数 */
   totalCandidates: number;
-  totalPages: number;
+  /** 数据加载状态 */
   loading: boolean;
 
+  /** 切换视图模式 */
   setViewMode: (mode: ViewMode) => void;
+  /** 更新筛选条件（自动重置到第一页） */
   setFilter: (filter: Partial<FilterState>) => void;
+  /** 设置当前页码 */
   setCurrentPage: (page: number) => void;
+  /** 设置每页大小（自动重置到第一页） */
   setPageSize: (size: number) => void;
+  /** 根据当前筛选和分页条件加载候选人列表 */
   loadCandidates: () => Promise<void>;
-  addCandidate: (candidate: Partial<Candidate>) => Promise<void>;
-  updateCandidate: (id: string, data: Partial<Candidate>) => Promise<void>;
-  updateCandidateStatus: (
-    id: string,
-    newStatus: CandidateStatus,
-    reason?: string,
-  ) => Promise<void>;
-  deleteCandidate: (id: string) => Promise<void>;
-  getFilteredCandidates: () => Candidate[];
+  /** 创建新候选人并追加到列表 */
+  addCandidate: (candidate: Partial<Candidate>) => Promise<Candidate>;
+  /** 获取总记录数 */
   getTotalCount: () => number;
-  getPagedCandidates: () => Candidate[];
+  /** 获取所有已存在的技能标签（去重排序） */
   getAllSkills: () => string[];
 }
 
 export const useCandidateStore = create<CandidateStore>((set, get) => ({
   candidates: [],
-  statusHistory: [],
   viewMode: 'table',
   filter: {
     searchKeyword: '',
@@ -57,7 +60,6 @@ export const useCandidateStore = create<CandidateStore>((set, get) => ({
   currentPage: 1,
   pageSize: 5,
   totalCandidates: 0,
-  totalPages: 0,
   loading: false,
 
   setViewMode: (mode) => set({ viewMode: mode }),
@@ -90,7 +92,6 @@ export const useCandidateStore = create<CandidateStore>((set, get) => ({
       set({
         candidates: response.items,
         totalCandidates: response.total,
-        totalPages: response.totalPages,
         loading: false,
       });
     } catch (error) {
@@ -106,76 +107,14 @@ export const useCandidateStore = create<CandidateStore>((set, get) => ({
         candidates: [newCandidate, ...state.candidates],
         totalCandidates: state.totalCandidates + 1,
       }));
+      return newCandidate;
     } catch (error) {
       console.error('添加候选人失败:', error);
       throw error;
     }
   },
 
-  updateCandidate: async (id, data) => {
-    try {
-      const updatedCandidate = await apiUpdateCandidate(id, data);
-      set((state) => ({
-        candidates: state.candidates.map((c) =>
-          c.id === id ? updatedCandidate : c,
-        ),
-      }));
-    } catch (error) {
-      console.error('更新候选人失败:', error);
-      throw error;
-    }
-  },
-
-  updateCandidateStatus: async (id, newStatus, reason) => {
-    const candidate = get().candidates.find((c) => c.id === id);
-    if (!candidate) return;
-
-    const historyRecord: StatusHistoryRecord = {
-      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-      candidateId: id,
-      fromStatus: candidate.status,
-      toStatus: newStatus,
-      changedAt: new Date().toISOString(),
-      changedBy: '当前用户',
-      reason,
-    };
-
-    try {
-      await apiUpdateCandidate(id, { status: newStatus });
-      set((state) => ({
-        candidates: state.candidates.map((c) =>
-          c.id === id ? { ...c, status: newStatus } : c,
-        ),
-        statusHistory: [...state.statusHistory, historyRecord],
-      }));
-    } catch (error) {
-      console.error('更新候选人状态失败:', error);
-      throw error;
-    }
-  },
-
-  deleteCandidate: async (id) => {
-    try {
-      await apiDeleteCandidate(id);
-      set((state) => ({
-        candidates: state.candidates.filter((c) => c.id !== id),
-        totalCandidates: state.totalCandidates - 1,
-      }));
-    } catch (error) {
-      console.error('删除候选人失败:', error);
-      throw error;
-    }
-  },
-
-  getFilteredCandidates: () => {
-    return get().candidates;
-  },
-
   getTotalCount: () => get().totalCandidates,
-
-  getPagedCandidates: () => {
-    return get().candidates;
-  },
 
   getAllSkills: () => {
     const { candidates } = get();

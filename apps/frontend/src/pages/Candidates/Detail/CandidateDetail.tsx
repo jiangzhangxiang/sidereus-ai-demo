@@ -1,3 +1,11 @@
+/**
+ * @fileoverview 候选人详情页
+ * @description 展示候选人完整信息，包括基本信息卡片、工作经历卡片、教育经历卡片、
+ *              技能标签展示、PDF 简历预览和评分明细（固定在右侧）。
+ *              支持从本地 Store 或 API 加载数据，提供返回列表导航。
+ * @module pages/Candidates/Detail/CandidateDetail
+ * @version 1.0.0
+ */
 import React, { useState, useEffect } from 'react';
 import { Row, Col, Tag, Button, Space, Typography, Spin } from 'antd';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -16,6 +24,7 @@ import type { Candidate } from '@demo/shared';
 
 const { Title, Paragraph } = Typography;
 
+/** 候选人详情页组件 */
 const CandidateDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();

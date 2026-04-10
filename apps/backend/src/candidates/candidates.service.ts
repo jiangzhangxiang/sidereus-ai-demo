@@ -1,3 +1,10 @@
+/**
+ * @fileoverview 候选人业务逻辑服务
+ * @description 提供候选人数据的 CRUD 操作、分页查询、条件筛选、排序等功能。
+ *              使用 TypeORM 进行数据库操作，支持按姓名/电话/邮箱模糊搜索、按状态筛选、按技能标签筛选。
+ * @module candidates/candidates.service
+ * @version 1.0.0
+ */
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like, In } from 'typeorm';
@@ -6,13 +13,21 @@ import { Candidate } from './candidate.entity';
 import { Education } from './education.entity';
 import { WorkExperience } from './work-experience.entity';
 
+/** 分页查询参数接口 */
 interface FindAllOptions {
+  /** 当前页码（从 1 开始） */
   page: number;
+  /** 每页记录数 */
   pageSize: number;
+  /** 搜索关键词（匹配姓名/电话/邮箱） */
   search?: string;
+  /** 状态筛选（pending/screened/interviewing/hired/rejected） */
   status?: string;
+  /** 技能标签筛选（数组，交集匹配） */
   skills?: string[];
+  /** 排序字段（score/uploadedAt） */
   sortBy?: string;
+  /** 排序方向（asc/desc） */
   sortOrder?: 'asc' | 'desc';
 }
 
@@ -27,6 +42,11 @@ export class CandidatesService {
     private workExperienceRepository: Repository<WorkExperience>,
   ) {}
 
+  /**
+   * 分页查询候选人列表
+   * @param options - 查询选项（分页、搜索、筛选、排序）
+   * @returns 分页结果（包含数据列表、总数、页码信息）
+   */
   async findAll(options: FindAllOptions) {
     const { page, pageSize, search, status, skills, sortBy, sortOrder } =
       options;
@@ -72,6 +92,11 @@ export class CandidatesService {
     };
   }
 
+  /**
+   * 根据 ID 查询单个候选人
+   * @param id - 候选人 ID
+   * @returns 候选人对象（包含教育和工作经历），不存在则返回 null
+   */
   async findOne(id: string): Promise<any | null> {
     const candidate = await this.candidateRepository.findOne({
       where: { id },
@@ -80,6 +105,11 @@ export class CandidatesService {
     return candidate ? plainToInstance(Candidate, candidate) : null;
   }
 
+  /**
+   * 创建新候选人
+   * @param createCandidateDto - 候选人数据（包含基本信息、教育经历、工作经历等）
+   * @returns 创建的候选人对象
+   */
   async create(createCandidateDto: any): Promise<any> {
     const { education, workExperience, ...candidateData } = createCandidateDto;
 
@@ -102,6 +132,13 @@ export class CandidatesService {
     return plainToInstance(Candidate, savedCandidate);
   }
 
+  /**
+   * 更新候选人信息
+   * @param id - 候选人 ID
+   * @param updateCandidateDto - 更新数据
+   * @returns 更新后的候选人对象
+   * @throws NotFoundException - 候选人不存在时抛出
+   */
   async update(id: string, updateCandidateDto: any): Promise<any> {
     const candidate = await this.findOne(id);
     if (!candidate) {
@@ -134,6 +171,11 @@ export class CandidatesService {
     return plainToInstance(Candidate, updatedCandidate);
   }
 
+  /**
+   * 删除候选人
+   * @param id - 候选人 ID
+   * @throws NotFoundException - 候选人不存在时抛出
+   */
   async remove(id: string): Promise<void> {
     const candidate = await this.findOne(id);
     if (!candidate) {

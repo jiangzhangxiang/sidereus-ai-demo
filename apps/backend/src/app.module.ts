@@ -1,3 +1,10 @@
+/**
+ * @fileoverview 应用根模块
+ * @description NestJS 应用入口模块，负责全局配置：环境变量加载、PostgreSQL 数据库连接、
+ *              子模块注册（FileUploadModule、CandidatesModule）及全局服务提供者。
+ * @module app.module
+ * @version 1.0.0
+ */
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';

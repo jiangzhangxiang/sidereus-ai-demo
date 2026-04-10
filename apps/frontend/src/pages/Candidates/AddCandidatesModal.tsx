@@ -1,3 +1,10 @@
+/**
+ * @fileoverview 添加候选人弹窗组件
+ * @description 模态对话框形式的候选人添加入口，集成 PDF 简历上传、SSE 流式解析、
+ *              内联表单编辑和提交功能。支持手动输入或 AI 解析两种方式创建候选人记录。
+ * @module pages/Candidates/AddCandidatesModal
+ * @version 1.0.0
+ */
 import React from 'react';
 import {
   Modal,
@@ -283,8 +290,8 @@ const AddCandidatesModal: React.FC<AddCandidatesModalProps> = ({
     };
 
     try {
-      await addCandidate(newCandidate);
-      setCreatedCandidateId(newCandidate.id);
+      const res = await addCandidate(newCandidate);
+      setCreatedCandidateId(res.id);
       setCurrentStep('success');
       message.success('候选人已成功添加！');
     } catch (error) {

@@ -1,13 +1,20 @@
+/**
+ * @fileoverview 基本信息卡片组件
+ * @description 展示候选人核心信息，包括头像（姓名首字母）、姓名、状态标签和联系方式（电话、邮箱、城市）。
+ *              使用 Ant Design Descriptions 组件布局，状态标签根据状态值动态着色。
+ * @module pages/Candidates/Detail/BasicInfoCard
+ * @version 1.0.0
+ */
 import React from 'react';
 import { Descriptions, Tag } from 'antd';
 import {
-  UserOutlined,
   MailOutlined,
   PhoneOutlined,
   EnvironmentOutlined,
 } from '@ant-design/icons';
 import type { CandidateBasicInfo } from '@demo/shared';
 
+/** 基本信息卡片 Props 接口 */
 interface BasicInfoCardProps {
   info: CandidateBasicInfo;
   status: string;
@@ -15,6 +22,7 @@ interface BasicInfoCardProps {
   statusColor: string;
 }
 
+/** 基本信息卡片组件 */
 const BasicInfoCard: React.FC<BasicInfoCardProps> = ({
   info,
   statusLabel,

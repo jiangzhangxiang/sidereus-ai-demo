@@ -1,3 +1,10 @@
+/**
+ * @fileoverview 简历上传页面
+ * @description 独立的简历上传页面，集成 FileUpload 组件实现文件上传、AI 解析和手动编辑功能。
+ *              解析完成后生成随机评分数据并添加到候选人列表，提供查看详情和继续上传入口。
+ * @module pages/Candidates/ResumeUpload
+ * @version 1.0.0
+ */
 import React from 'react';
 import { Card, Button, message, Result } from 'antd';
 import { useNavigate } from 'react-router-dom';
@@ -7,6 +14,7 @@ import { useCandidateStore } from '../../store/candidateStore';
 import type { Candidate } from '@demo/shared';
 import type { UploadResponse } from '../../api/upload';
 
+/** 简历上传页面组件 */
 const ResumeUpload: React.FC = () => {
   const navigate = useNavigate();
   const { addCandidate } = useCandidateStore();

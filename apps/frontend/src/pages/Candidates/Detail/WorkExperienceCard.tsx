@@ -1,3 +1,10 @@
+/**
+ * @fileoverview 工作经历卡片组件
+ * @description 以时间线形式展示候选人的工作经历列表，每条记录包含公司、职位、时间段和工作描述。
+ *              支持多段工作经历展示，顶部显示总段数统计。
+ * @module pages/Candidates/Detail/WorkExperienceCard
+ * @version 1.0.0
+ */
 import React from 'react';
 import { Card, Tag } from 'antd';
 import {
@@ -7,10 +14,12 @@ import {
 } from '@ant-design/icons';
 import type { WorkExperience } from '@demo/shared';
 
+/** 工作经历卡片 Props 接口 */
 interface WorkExperienceCardProps {
   workExperience: WorkExperience[];
 }
 
+/** 工作经历卡片组件 */
 const WorkExperienceCard: React.FC<WorkExperienceCardProps> = ({
   workExperience,
 }) => {

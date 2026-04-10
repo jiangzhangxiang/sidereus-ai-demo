@@ -1,8 +1,17 @@
+/**
+ * @fileoverview 数据库种子数据脚本
+ * @description 用于初始化数据库的种子数据，向 candidates 表插入示例候选人记录。
+ *              包含完整的候选人信息：基本信息、教育经历、工作经历、技能标签、评分明细等。
+ *              通过 TypeORM DataSource 直接操作数据库，绕过 NestJS 应用层。
+ * @module seed
+ * @version 1.0.0
+ */
 import { Candidate } from '../src/candidates/candidate.entity';
 import { Education } from '../src/candidates/education.entity';
 import { WorkExperience } from '../src/candidates/work-experience.entity';
 import { DataSource } from 'typeorm';
 
+/** TypeORM 数据源配置，连接本地 PostgreSQL */
 const AppDataSource = new DataSource({
   type: 'postgres',
   host: 'localhost',
@@ -14,6 +23,7 @@ const AppDataSource = new DataSource({
   synchronize: true,
 });
 
+/** 种子数据列表（示例候选人） */
 const seedData = [
   {
     basicInfo: {
@@ -61,6 +71,10 @@ const seedData = [
   },
 ];
 
+/**
+ * 执行种子数据导入
+ * 初始化数据库连接并逐条写入候选人数据
+ */
 async function seed() {
   await AppDataSource.initialize();
   console.log('✅ 数据库连接成功');

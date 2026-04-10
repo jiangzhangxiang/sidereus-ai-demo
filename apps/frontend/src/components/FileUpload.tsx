@@ -1,3 +1,10 @@
+/**
+ * @fileoverview 文件上传组件
+ * @description 通用 PDF 简历上传组件，支持拖拽上传、文件格式/大小校验、SSE 流式解析进度展示。
+ *              解析完成后提供内联表单编辑功能，支持修改基本信息、教育经历、工作经历和技能标签。
+ * @module components/FileUpload
+ * @version 1.0.0
+ */
 import React from 'react';
 import {
   Upload,

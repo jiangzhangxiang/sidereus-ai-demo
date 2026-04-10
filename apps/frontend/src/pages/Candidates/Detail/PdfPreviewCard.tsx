@@ -1,3 +1,10 @@
+/**
+ * @fileoverview PDF 简历预览卡片组件
+ * @description 展示候选人的原始简历文件信息，提供预览和下载按钮。
+ *              点击预览按钮弹出 Modal 对话框，展示模拟的 PDF 预览区域（实际项目可集成 PDF.js）。
+ * @module pages/Candidates/Detail/PdfPreviewCard
+ * @version 1.0.0
+ */
 import React, { useState } from 'react';
 import { Card, Button, Modal } from 'antd';
 import {
@@ -6,11 +13,13 @@ import {
   DownloadOutlined,
 } from '@ant-design/icons';
 
+/** PDF 预览卡片 Props 接口 */
 interface PdfPreviewCardProps {
   resumeUrl: string;
   candidateName: string;
 }
 
+/** PDF 简历预览卡片组件 */
 const PdfPreviewCard: React.FC<PdfPreviewCardProps> = ({
   resumeUrl,
   candidateName,

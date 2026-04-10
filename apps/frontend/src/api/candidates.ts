@@ -1,7 +1,16 @@
+/**
+ * @fileoverview 候选人 API 请求模块
+ * @description 封装与后端 /api/candidates 接口的所有 HTTP 通信逻辑。
+ *              提供分页查询、详情查询、创建、更新和删除候选人的异步函数。
+ * @module api/candidates
+ * @version 1.0.0
+ */
 import type { Candidate, FilterState } from '@demo/shared';
 
+/** 后端 API 基础地址 */
 const API_BASE_URL = 'http://localhost:3000';
 
+/** 分页响应通用结构 */
 export interface PaginatedResponse<T> {
   items: T[];
   total: number;
@@ -10,6 +19,12 @@ export interface PaginatedResponse<T> {
   totalPages: number;
 }
 
+/**
+ * 分页查询候选人列表
+ * @param params - 查询参数（分页、搜索、筛选、排序）
+ * @returns 分页结果（包含候选人列表及元信息）
+ * @throws Error - 请求失败时抛出
+ */
 export async function fetchCandidates(params?: {
   page?: number;
   pageSize?: number;
@@ -42,6 +57,12 @@ export async function fetchCandidates(params?: {
   return response.json();
 }
 
+/**
+ * 根据 ID 查询候选人详情
+ * @param id - 候选人 UUID
+ * @returns 候选人完整信息
+ * @throws Error - 请求失败时抛出
+ */
 export async function fetchCandidateById(id: string): Promise<Candidate> {
   const response = await fetch(`${API_BASE_URL}/api/candidates/${id}`);
 
@@ -52,6 +73,12 @@ export async function fetchCandidateById(id: string): Promise<Candidate> {
   return response.json();
 }
 
+/**
+ * 创建新候选人
+ * @param data - 候选人数据
+ * @returns 创建的候选人对象
+ * @throws Error - 请求失败时抛出
+ */
 export async function createCandidate(data: Partial<Candidate>): Promise<Candidate> {
   const response = await fetch(`${API_BASE_URL}/api/candidates`, {
     method: 'POST',
@@ -66,6 +93,13 @@ export async function createCandidate(data: Partial<Candidate>): Promise<Candida
   return response.json();
 }
 
+/**
+ * 更新候选人信息
+ * @param id - 候选人 UUID
+ * @param data - 需要更新的字段数据
+ * @returns 更新后的候选人对象
+ * @throws Error - 请求失败时抛出
+ */
 export async function updateCandidate(
   id: string,
   data: Partial<Candidate>,
@@ -83,6 +117,11 @@ export async function updateCandidate(
   return response.json();
 }
 
+/**
+ * 删除候选人
+ * @param id - 候选人 UUID
+ * @throws Error - 请求失败时抛出
+ */
 export async function deleteCandidate(id: string): Promise<void> {
   const response = await fetch(`${API_BASE_URL}/api/candidates/${id}`, {
     method: 'DELETE',

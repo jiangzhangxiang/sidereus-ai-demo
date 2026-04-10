@@ -1,3 +1,10 @@
+/**
+ * @fileoverview 候选人表格组件
+ * @description 以 Ant Design Table 形式展示候选人列表，包含姓名、联系方式、技能标签、评分、
+ *              状态、上传时间和操作列。支持排序和行点击跳转。
+ * @module pages/Candidates/CandidateTable
+ * @version 1.0.0
+ */
 import React from 'react';
 import { Tag } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
@@ -17,6 +24,7 @@ import {
   CandidateStatusColors,
 } from '@demo/shared';
 
+/** 候选人表格 Props 接口 */
 interface CandidateTableProps {
   candidates: Candidate[];
 }
@@ -24,6 +32,7 @@ interface CandidateTableProps {
 const statusLabels = CandidateStatusLabels;
 const statusColors = CandidateStatusColors;
 
+/** 候选人表格组件 */
 const CandidateTable: React.FC<CandidateTableProps> = ({ candidates }) => {
   const navigate = useNavigate();
 

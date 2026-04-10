@@ -1,3 +1,11 @@
+/**
+ * @fileoverview 筛选工具栏组件
+ * @description 提供候选人列表的多维筛选能力，包括关键词搜索、排序字段/方向切换、
+ *              状态多选筛选、技能标签多选筛选以及表格/卡片视图模式切换。
+ *              已激活的筛选项以 Tag 形式展示并支持单独移除。
+ * @module pages/Candidates/FilterBar
+ * @version 1.0.0
+ */
 import React from 'react';
 import {
   Input,
@@ -15,6 +23,7 @@ import {
 } from '@ant-design/icons';
 import type { CandidateStatus, ViewMode, SortField, SortOrder } from '@demo/shared';
 
+/** 筛选工具栏 Props 接口 */
 interface FilterBarProps {
   viewMode: ViewMode;
   searchKeyword: string;
@@ -32,6 +41,7 @@ interface FilterBarProps {
   onReset: () => void;
 }
 
+/** 候选人状态选项映射 */
 const statusOptions = Object.entries({
   pending: '待筛选',
   screened: '初筛通过',
@@ -40,6 +50,7 @@ const statusOptions = Object.entries({
   rejected: '已淘汰',
 }) as [CandidateStatus, string][];
 
+/** 筛选工具栏组件 */
 const FilterBar: React.FC<FilterBarProps> = ({
   viewMode,
   searchKeyword,

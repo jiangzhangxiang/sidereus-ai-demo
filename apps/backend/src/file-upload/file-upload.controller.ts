@@ -1,3 +1,10 @@
+/**
+ * @fileoverview 文件上传控制器
+ * @description 处理简历文件上传请求，支持 PDF 文件上传、解析及流式响应。
+ *              根据客户端 Accept 头自动选择普通 JSON 响应或 SSE（Server-Sent Events）流式响应模式。
+ * @module file-upload/file-upload.controller
+ * @version 1.0.0
+ */
 import {
   Controller,
   Post,
@@ -18,6 +25,12 @@ export class FileUploadController {
     private readonly resumeParserService: ResumeParserService,
   ) {}
 
+  /**
+   * 上传并解析 PDF 简历
+   * @param file - 上传的 PDF 文件（Multer 处理）
+   * @param res - Express Response 对象（用于自定义响应格式）
+   * @param acceptHeader - 客户端 Accept 请求头（判断是否需要 SSE 流式响应）
+   */
   @Post('resume')
   @UseInterceptors(FileInterceptor('file'))
   async uploadResume(

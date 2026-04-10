@@ -1,3 +1,11 @@
+/**
+ * @fileoverview 状态管理卡片组件
+ * @description 提供候选人状态的可视化管理和变更功能，包括 Steps 进度条展示、
+ *              当前状态高亮、可执行的操作按钮以及状态变更历史记录（Timeline 形式）。
+ *              支持添加变更原因备注，状态流转遵循预定义的业务规则。
+ * @module pages/Candidates/Detail/StatusManagement
+ * @version 1.0.0
+ */
 import React, { useState } from 'react';
 import {
   Card,
@@ -21,6 +29,7 @@ import type {
   StatusHistoryRecord,
 } from '@demo/shared';
 
+/** 状态管理卡片 Props 接口 */
 interface StatusManagementProps {
   currentStatus: CandidateStatus;
   candidateId: string;
@@ -32,6 +41,7 @@ interface StatusManagementProps {
   ) => void;
 }
 
+/** 候选人状态中文标签映射 */
 const statusLabels: Record<CandidateStatus, string> = {
   pending: '待筛选',
   screened: '初筛通过',
@@ -40,6 +50,7 @@ const statusLabels: Record<CandidateStatus, string> = {
   rejected: '已淘汰',
 };
 
+/** 候选人状态颜色映射 */
 const statusColors: Record<CandidateStatus, string> = {
   pending: 'default',
   screened: 'processing',
@@ -48,6 +59,7 @@ const statusColors: Record<CandidateStatus, string> = {
   rejected: 'error',
 };
 
+/** 候选人状态图标映射 */
 const statusIcons: Record<CandidateStatus, React.ReactNode> = {
   pending: <ClockCircleOutlined />,
   screened: <CheckCircleOutlined />,
@@ -56,12 +68,14 @@ const statusIcons: Record<CandidateStatus, React.ReactNode> = {
   rejected: <CloseCircleOutlined />,
 };
 
+/** 状态流转顺序（用于 Steps 进度条） */
 const statusOrder: CandidateStatus[] = [
   'pending',
   'screened',
   'interviewing',
 ];
 
+/** 状态选项接口定义 */
 interface StatusOption {
   key: CandidateStatus;
   label: string;
@@ -69,6 +83,7 @@ interface StatusOption {
   icon: React.ReactNode;
 }
 
+/** 状态流转规则映射表：定义每个状态可流转到的下一状态 */
 const nextStatusMap: Record<CandidateStatus, StatusOption[]> = {
   pending: [
     {
@@ -123,8 +138,10 @@ const nextStatusMap: Record<CandidateStatus, StatusOption[]> = {
   ],
 };
 
+/** Steps 组件状态类型 */
 type StepStatusType = 'wait' | 'process' | 'finish' | 'error';
 
+/** 状态管理卡片组件 */
 const StatusManagement: React.FC<StatusManagementProps> = ({
   currentStatus,
   candidateId,

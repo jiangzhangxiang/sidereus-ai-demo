@@ -1,15 +1,23 @@
+/**
+ * @fileoverview 主布局组件
+ * @description 应用的主框架布局，包含固定侧边栏导航、顶部标题栏和内容区域。
+ *              使用 Ant Design Layout 组件构建，侧边栏包含系统 Logo 和菜单导航，
+ *              内容区域通过 Outlet 渲染子路由页面。
+ * @module layouts/MainLayout
+ * @version 1.0.0
+ */
 import React from 'react';
 import { Layout, Menu, Typography } from 'antd';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import {
   TeamOutlined,
-  UploadOutlined,
   UserOutlined,
 } from '@ant-design/icons';
 
 const { Header, Sider, Content } = Layout;
 const { Title } = Typography;
 
+/** 主布局组件：提供全局导航框架和页面容器 */
 const MainLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -20,13 +28,9 @@ const MainLayout: React.FC = () => {
       icon: <TeamOutlined />,
       label: '候选人列表',
     },
-    {
-      key: '/upload',
-      icon: <UploadOutlined />,
-      label: '上传简历',
-    },
   ];
 
+  /** 根据当前路径计算选中的菜单项 key */
   const getSelectedKey = () => {
     if (location.pathname.startsWith('/candidates')) {
       return '/candidates';

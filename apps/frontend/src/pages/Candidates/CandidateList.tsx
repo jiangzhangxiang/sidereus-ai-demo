@@ -1,5 +1,12 @@
+/**
+ * @fileoverview 候选人列表页
+ * @description 候选人管理的主页面，集成筛选栏、表格/卡片视图切换、分页控制和添加候选人弹窗。
+ *              通过 Zustand Store 管理数据加载和筛选状态，支持按关键词、状态、技能标签进行多维筛选。
+ * @module pages/Candidates/CandidateList
+ * @version 1.0.0
+ */
 import React, { useEffect, useState } from 'react';
-import { Table, Row, Col, Empty, Pagination, Spin, Button } from 'antd';
+import { Table, Row, Col, Empty, Pagination, Button } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { useCandidateStore } from '../../store/candidateStore';
 import FilterBar from './FilterBar';
@@ -14,12 +21,12 @@ const CandidateList: React.FC = () => {
     currentPage,
     pageSize,
     loading,
+    candidates,
     setViewMode,
     setFilter,
     setCurrentPage,
     setPageSize,
     loadCandidates,
-    getPagedCandidates,
     getTotalCount,
     getAllSkills,
   } = useCandidateStore();
@@ -28,7 +35,7 @@ const CandidateList: React.FC = () => {
     loadCandidates();
   }, [filter, currentPage, pageSize, loadCandidates]);
 
-  const pagedCandidates = getPagedCandidates();
+  const pagedCandidates = candidates;
   const total = getTotalCount();
   const allSkills = getAllSkills();
 

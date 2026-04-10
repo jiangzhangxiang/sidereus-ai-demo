@@ -1,3 +1,10 @@
+/**
+ * @fileoverview 教育经历卡片组件
+ * @description 以时间线形式展示候选人的教育经历列表，每条记录包含学校、专业、学历和毕业时间。
+ *              学历标签根据学位类型（博士/硕士/本科/大专）使用不同颜色。
+ * @module pages/Candidates/Detail/EducationCard
+ * @version 1.0.0
+ */
 import React from 'react';
 import { Card, Tag } from 'antd';
 import {
@@ -7,10 +14,12 @@ import {
 } from '@ant-design/icons';
 import type { Education } from '@demo/shared';
 
+/** 教育经历卡片 Props 接口 */
 interface EducationCardProps {
   education: Education[];
 }
 
+/** 学历颜色映射表 */
 const degreeColors: Record<string, string> = {
   '博士': 'purple',
   '硕士': 'blue',
@@ -18,6 +27,7 @@ const degreeColors: Record<string, string> = {
   '大专': 'orange',
 };
 
+/** 教育经历卡片组件 */
 const EducationCard: React.FC<EducationCardProps> = ({ education }) => {
   return (
     <Card
