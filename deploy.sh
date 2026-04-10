@@ -56,7 +56,9 @@ clone_project() {
     if [ -d "$PROJECT_DIR" ]; then
         echo "   项目已存在，正在更新..."
         cd "$PROJECT_DIR"
-        git pull origin main
+        git fetch origin main
+        git reset --hard origin/main
+        git clean -fd
     else
         echo "   正在克隆项目..."
         git clone "$GIT_REPO" "$PROJECT_DIR"
