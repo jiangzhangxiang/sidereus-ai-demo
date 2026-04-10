@@ -185,14 +185,6 @@ export class CandidatesService {
     await this.candidateRepository.remove(candidate);
   }
 
-  private readonly statusFlowMap: Record<string, string[]> = {
-    pending: ['screened'],
-    screened: ['interviewing'],
-    interviewing: ['hired'],
-    hired: [],
-    rejected: ['pending'],
-  };
-
   async updateStatus(id: string, updateStatusDto: UpdateStatusDto): Promise<any> {
     const candidate = await this.findOne(id);
     if (!candidate) {
@@ -204,13 +196,6 @@ export class CandidatesService {
 
     if (currentStatus === newStatus) {
       throw new BadRequestException(`候选人当前状态已是 ${newStatus}，无需更新`);
-    }
-
-    const allowedTransitions = this.statusFlowMap[currentStatus] || [];
-    if (!allowedTransitions.includes(newStatus)) {
-      throw new BadRequestException(
-        `不允许从 ${currentStatus} 状态转换到 ${newStatus} 状态。允许的转换：${allowedTransitions.join(', ') || '无'}`,
-      );
     }
 
     candidate.status = newStatus;
