@@ -1,73 +1,99 @@
-# React + TypeScript + Vite
+# 前端应用 (frontend)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+候选人管理系统的 React 前端应用，基于 Vite + TypeScript + Ant Design 技术栈。
 
-Currently, two official plugins are available:
+## 项目概述
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+本前端应用是「全栈 Monorepo 候选人管理系统」的客户端部分，提供候选人列表、详情、新增、筛选、岗位编辑、智能匹配结果展示等页面功能，通过 RESTful API 与后端 NestJS 服务交互。
 
-## React Compiler
+## 页面结构
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+src/
+├── api/                    # API 请求封装
+│   ├── candidates.ts       # 候选人接口
+│   ├── jobs.ts             # 岗位接口
+│   ├── match.ts            # 匹配接口
+│   └── upload.ts           # 文件上传接口
+├── components/             # 公共组件
+│   ├── FileUpload.tsx      # 简历文件上传组件
+│   └── MatchResultDrawer.tsx  # 匹配结果抽屉组件
+├── layouts/                # 布局组件
+│   └── MainLayout.tsx      # 主布局（侧边栏 + 内容区）
+├── pages/
+│   ├── Candidates/         # 候选人模块页面
+│   │   ├── CandidateList.tsx        # 候选人列表页
+│   │   ├── CandidateTable.tsx       # 候选人表格
+│   │   ├── CandidateCard.tsx        # 候选人卡片
+│   │   ├── FilterBar.tsx            # 筛选工具栏
+│   │   ├── AddCandidatesModal.tsx   # 新增候选人弹窗
+│   │   ├── ResumeUpload.tsx         # 简历上传区域
+│   │   ├── StatusChangeModal.tsx    # 状态变更弹窗
+│   │   └── Detail/                  # 候选人详情页
+│   │       ├── CandidateDetail.tsx  # 详情主容器
+│   │       ├── BasicInfoCard.tsx    # 基本信息卡片
+│   │       ├── EducationCard.tsx    # 教育经历卡片
+│   │       ├── WorkExperienceCard.tsx  # 工作经历卡片
+│   │       ├── ScoreBreakdownCard.tsx  # 评分明细卡片
+│   │       └── StatusManagement.tsx    # 状态管理组件
+│   └── Jobs/               # 岗位模块页面
+│       └── JobEdit.tsx     # 岗位编辑页
+├── store/                  # Zustand 状态管理
+│   └── candidateStore.ts   # 候选人状态 Store
+├── App.tsx                 # 路由配置（React Router）
+├── main.tsx                # 应用入口
+├── App.css / index.css     # 全局样式
+└── assets/                 # 静态资源（图片等）
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 技术栈
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+| 技术 | 版本 | 用途 |
+|------|------|------|
+| React | 19 | UI 框架 |
+| TypeScript | ~6.0 | 类型安全 |
+| Vite | 5 | 构建工具 |
+| React Router | 7 | 路由管理 |
+| Zustand | 5 | 状态管理 |
+| Ant Design | 6 | UI 组件库 |
+| @ant-design/icons | 5 | 图标库 |
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## 功能页面
+
+### 候选人管理 (Candidates)
+
+- **列表页**：候选人卡片/表格展示、关键词搜索、状态筛选
+- **详情页**：基本信息、教育经历、工作经历、评分明细、状态流转
+- **新增**：手动录入或 PDF 简历上传解析
+- **状态管理**：待筛选 → 初筛 → 面试中 → 已录用 / 已淘汰
+
+### 岗位管理 (Jobs)
+
+- **岗位编辑**：创建和编辑岗位信息（名称、描述、必备技能、加分技能）
+
+### 智能匹配 (Match)
+
+- **匹配结果**：抽屉式展示多维度评分与 AI 评语
+
+## 开发脚本
+
+```bash
+# 安装依赖
+pnpm install
+
+# 开发模式启动（热重载）
+pnpm dev
+
+# 类型检查 + 构建
+pnpm build
+
+# 代码检查
+pnpm lint
+
+# 预览生产构建
+pnpm preview
 ```
+
+## 访问地址
+
+开发模式启动后访问：**http://localhost:5173**

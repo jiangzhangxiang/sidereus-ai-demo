@@ -1,98 +1,104 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 后端服务 (backend)
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+候选人管理系统的 NestJS 后端应用，基于 Fastify 适配器 + TypeORM + PostgreSQL 技术栈。
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 项目概述
 
-## Description
+本后端服务是「全栈 Monorepo 候选人管理系统」的服务端部分，提供 RESTful API 接口，支持候选人 CRUD、岗位管理、智能匹配、简历上传与解析等核心功能。
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## 模块结构
 
-## Project setup
-
-```bash
-$ pnpm install
+```
+src/
+├── candidates/          # 候选人模块
+│   ├── candidate.entity.ts        # 候选人实体（JSONB 存储）
+│   ├── education.entity.ts        # 教育经历实体
+│   ├── work-experience.entity.ts  # 工作经历实体
+│   ├── candidates.controller.ts   # REST 控制器
+│   ├── candidates.service.ts      # 业务逻辑层
+│   ├── candidates.module.ts       # 模块定义
+│   └── dto/                       # 数据传输对象
+├── jobs/                # 岗位管理模块
+│   ├── job.entity.ts               # 岗位实体
+│   ├── jobs.controller.ts          # REST 控制器
+│   ├── jobs.service.ts             # 业务逻辑层
+│   └── dto/job.dto.ts              # 岗位 DTO
+├── match/               # 智能匹配模块
+│   ├── match.controller.ts         # 匹配控制器
+│   ├── match.service.ts            # 匹配算法服务
+│   └── dto/match.dto.ts            # 匹配请求 DTO
+├── file-upload/          # 文件上传模块
+│   ├── file-upload.controller.ts   # 文件上传接口
+│   ├── file-upload.service.ts      # 文件存储服务
+│   └── resume-parser.service.ts    # PDF 简历解析服务
+├── app.module.ts        # 根模块（数据库配置 / 模块注册）
+└── main.ts              # 应用入口（Fastify 适配器）
 ```
 
-## Compile and run the project
+## 技术栈
+
+| 技术 | 用途 |
+|------|------|
+| NestJS 11 | 服务端框架 |
+| Fastify | HTTP 适配器（高性能） |
+| TypeORM 0.3 | ORM（PostgreSQL） |
+| PostgreSQL 15 | 关系型数据库 |
+| class-validator | DTO 校验 |
+| @fastify/multipart | 文件上传处理 |
+| pdf-parse | PDF 简历文本提取 |
+
+## API 接口
+
+| 模块 | 方法 | 路径 | 说明 |
+|------|------|------|------|
+| 候选人 | GET | `/candidates` | 获取候选人列表 |
+| 候选人 | GET | `/candidates/:id` | 获取候选人详情 |
+| 候选人 | POST | `/candidates` | 创建候选人 |
+| 候选人 | PATCH | `/candidates/:id/status` | 更新候选人状态 |
+| 岗位 | GET | `/jobs` | 获取岗位列表 |
+| 岗位 | POST | `/jobs` | 创建岗位 |
+| 匹配 | POST | `/match` | 执行人岗智能匹配 |
+| 上传 | POST | `/upload/resume` | 上传并解析简历 PDF |
+
+## 开发脚本
 
 ```bash
-# development
-$ pnpm run start
+# 安装依赖
+pnpm install
 
-# watch mode
-$ pnpm run start:dev
+# 开发模式启动（热重载）
+pnpm start:dev
 
-# production mode
-$ pnpm run start:prod
+# 构建生产版本
+pnpm build
+
+# 生产模式启动
+pnpm start:prod
+
+# 代码检查
+pnpm lint
+
+# 代码格式化
+pnpm format
+
+# 单元测试
+pnpm test
+
+# 测试覆盖率
+pnpm test:cov
+
+# E2E 测试
+pnpm test:e2e
 ```
 
-## Run tests
+## 环境变量
 
-```bash
-# unit tests
-$ pnpm run test
+在项目根目录创建 `.env.local` 文件：
 
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
+```env
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=demo
+DB_PASSWORD=demo
+DB_DATABASE=demo
 ```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
