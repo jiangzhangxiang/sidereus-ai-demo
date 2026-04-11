@@ -70,7 +70,7 @@ clone_project() {
 
 configure_docker_mirror() {
     echo ""
-    echo "🐳 [3.5/6] 配置 Docker 镜像加速..."
+    echo "🐳 [3.5/6] 配置 Docker 镜像加速和 UFW 兼容..."
 
     mkdir -p /etc/docker
 
@@ -80,13 +80,14 @@ configure_docker_mirror() {
     "https://docker.1ms.run",
     "https://docker.xuanyuan.me",
     "https://dockerpull.org"
-  ]
+  ],
+  "iptables": false
 }
 EOF
 
     systemctl restart docker > /dev/null 2>&1
 
-    echo "✅ Docker 镜像加速器配置完成"
+    echo "✅ Docker 配置完成（已启用 UFW 兼容模式）"
 }
 
 configure_env() {
@@ -154,6 +155,13 @@ setup_firewall() {
     ufw allow "${BACKEND_PORT}/tcp" > /dev/null 2>&1
 
     echo "y" | ufw enable > /dev/null 2>&1
+
+    if [ -f /etc/ufw/before.rules ]; then
+        if ! grep -q "DOCKER-USER" /etc/ufw/before.rules; then
+            sed -i '/^# Don\\'t delete these required lines/i \\n# Docker UFW 兼容规则\\n*filter\\n:DOCKER-USER - [0:0]\\n-A DOCKER-USER -i docker0 -o eth0 -j RETURN\\n-A DOCKER-USER -i eth0 -p tcp --dport '"${BACKEND_PORT}"' -j ACCEPT\\n-A DOCKER-USER -i eth0 -p tcp --dport '"${FRONTEND_PORT}"' -j ACCEPT\\n-A DOCKER-USER -j DROP\\nCOMMIT\n' /etc/ufw/before.rules
+            ufw reload > /dev/null 2>&1
+        fi
+    fi
 
     echo "✅ 防火墙配置完成"
     echo "   已开放端口: SSH(22), HTTP(${FRONTEND_PORT}), API(${BACKEND_PORT})"
