@@ -97,7 +97,7 @@ const CandidateCard: React.FC<CandidateCardProps> = ({ candidate }) => {
           gap: 6,
         }}
       >
-        {candidate.skills.map((skill) => (
+        {candidate.skills.map((skill: string) => (
           <Tag key={skill} color="blue" style={{ marginBottom: 2 }}>
             {skill}
           </Tag>
@@ -105,7 +105,7 @@ const CandidateCard: React.FC<CandidateCardProps> = ({ candidate }) => {
       </div>
 
       <div style={{ marginTop: 12 }}>
-        {candidate.workExperience.slice(0, 1).map((work, idx) => (
+        {candidate.workExperience.slice(0, 1).map((work, idx: number) => (
           <div key={idx} style={{ fontSize: 13, color: '#666' }}>
             <strong>{work.company}</strong> · {work.position}
           </div>

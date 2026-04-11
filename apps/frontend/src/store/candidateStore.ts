@@ -119,7 +119,7 @@ export const useCandidateStore = create<CandidateStore>((set, get) => ({
   getAllSkills: () => {
     const { candidates } = get();
     const skillSet = new Set<string>();
-    candidates.forEach((c) => c.skills.forEach((s) => skillSet.add(s)));
+    candidates.forEach((c) => c.skills.forEach((s: string) => skillSet.add(s)));
     return Array.from(skillSet).sort();
   },
 }));

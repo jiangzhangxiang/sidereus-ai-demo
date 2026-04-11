@@ -175,7 +175,7 @@ const MatchResultDrawer: React.FC<MatchResultDrawerProps> = ({
             <Space direction="vertical" style={{ width: '100%' }} size="middle">
               {(Object.entries(result.dimensions) as [keyof MatchResult['dimensions'], number][]).map(
                 ([key, value]) => (
-                  <div key={key}>
+                  <div key={String(key)}>
                     <div
                       style={{
                         display: 'flex',

@@ -149,7 +149,7 @@ const StatusChangeModal: React.FC<StatusChangeModalProps> = ({
             }}
           >
             <span style={{ color: '#666' }}>预览：</span>
-            <Tag color={CandidateStatusColors[candidate?.status]}>
+            <Tag color={candidate ? CandidateStatusColors[candidate.status] : 'default'}>
               {candidate ? CandidateStatusLabels[candidate.status] : ''}
             </Tag>
             <span style={{ color: '#999', fontWeight: 600 }}>→</span>

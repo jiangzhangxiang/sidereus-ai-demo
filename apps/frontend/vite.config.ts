@@ -9,4 +9,12 @@ export default defineConfig({
       '@demo/shared': path.resolve(__dirname, '../../packages/shared/src/index.ts'),
     },
   },
+  optimizeDeps: {
+    include: ['@ant-design/icons', '@ant-design/icons-svg'],
+  },
+  build: {
+    commonjsOptions: {
+      include: [/node_modules/],
+    },
+  },
 })

@@ -155,7 +155,7 @@ const CandidateDetail: React.FC = () => {
               技能标签
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-              {candidate.skills.map((skill) => (
+              {candidate.skills.map((skill: string) => (
                 <Tag
                   key={skill}
                   color="blue"

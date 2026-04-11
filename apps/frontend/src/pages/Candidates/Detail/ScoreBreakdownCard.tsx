@@ -109,7 +109,7 @@ const ScoreBreakdownCard: React.FC<ScoreBreakdownCardProps> = ({
       </div>
 
       {scoreItems.map((item) => (
-        <div key={item.key} style={{ marginBottom: 18 }}>
+        <div key={String(item.key)} style={{ marginBottom: 18 }}>
           <div
             style={{
               display: 'flex',
