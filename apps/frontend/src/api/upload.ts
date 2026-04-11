@@ -5,7 +5,7 @@
  * @module api/upload
  * @version 1.0.0
  */
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000';
 
 /** 上传成功后的简历解析结果 */
 export interface UploadResponse {
