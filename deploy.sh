@@ -80,8 +80,7 @@ configure_docker_mirror() {
     "https://docker.1ms.run",
     "https://docker.xuanyuan.me",
     "https://dockerpull.org"
-  ],
-  "iptables": false
+  ]
 }
 EOF
 
@@ -131,17 +130,64 @@ start_services() {
     docker compose -f docker-compose.prod.yml up -d
 
     echo "   等待服务启动..."
-    sleep 8
+    sleep 10
 
-    if docker compose -f docker-compose.prod.yml ps | grep -q "Up"; then
-        echo "✅ 服务启动成功"
-    else
-        echo "❌ 服务启动失败，请查看日志："
-        docker compose -f docker-compose.prod.yml logs
-        exit 1
+    echo ""
+    echo "   📊 检查服务状态..."
+
+    local all_healthy=true
+
+    if ! docker compose -f docker-compose.prod.yml ps | grep -q "Up"; then
+        echo "❌ 服务启动失败"
+        all_healthy=false
     fi
 
+    echo ""
+    echo "   📋 容器状态："
     docker compose -f docker-compose.prod.yml ps
+
+    echo ""
+    echo "   🔍 检查后端服务..."
+
+    local backend_status=$(docker inspect --format='{{.State.Status}}' demo-backend 2>/dev/null || echo "not_found")
+
+    if [ "$backend_status" = "running" ]; then
+        echo "   ✅ 后端容器运行中"
+
+        sleep 5
+        if curl -sf http://localhost:${BACKEND_PORT}/api/health > /dev/null 2>&1 || \
+           curl -sf http://localhost:${BACKEND_PORT}/api > /dev/null 2>&1 || \
+           curl -sf http://localhost:${BACKEND_PORT} > /dev/null 2>&1; then
+            echo "   ✅ 后端 API 可访问 (端口 ${BACKEND_PORT})"
+        else
+            echo "   ⚠️  后端 API 暂时无法访问，等待初始化..."
+            sleep 10
+            if curl -sf http://localhost:${BACKEND_PORT}/api > /dev/null 2>&1; then
+                echo "   ✅ 后端 API 现在可访问"
+            else
+                echo "   ❌ 后端 API 仍然无法访问"
+                echo ""
+                echo "   📝 后端日志（最近 30 行）："
+                docker logs --tail 30 demo-backend 2>&1
+                all_healthy=false
+            fi
+        fi
+    else
+        echo "   ❌ 后端容器状态: $backend_status"
+        echo ""
+        echo "   📝 后端日志："
+        docker logs demo-backend 2>&1 | tail -50
+        all_healthy=false
+    fi
+
+    if [ "$all_healthy" = true ]; then
+        echo ""
+        echo "✅ 所有服务启动成功"
+    else
+        echo ""
+        echo "❌ 部分服务启动失败，请检查上方日志"
+        exit 1
+    fi
 }
 
 setup_firewall() {
@@ -155,13 +201,6 @@ setup_firewall() {
     ufw allow "${BACKEND_PORT}/tcp" > /dev/null 2>&1
 
     echo "y" | ufw enable > /dev/null 2>&1
-
-    if [ -f /etc/ufw/before.rules ]; then
-        if ! grep -q "DOCKER-USER" /etc/ufw/before.rules; then
-            sed -i '/^# Don\\'t delete these required lines/i \\n# Docker UFW 兼容规则\\n*filter\\n:DOCKER-USER - [0:0]\\n-A DOCKER-USER -i docker0 -o eth0 -j RETURN\\n-A DOCKER-USER -i eth0 -p tcp --dport '"${BACKEND_PORT}"' -j ACCEPT\\n-A DOCKER-USER -i eth0 -p tcp --dport '"${FRONTEND_PORT}"' -j ACCEPT\\n-A DOCKER-USER -j DROP\\nCOMMIT\n' /etc/ufw/before.rules
-            ufw reload > /dev/null 2>&1
-        fi
-    fi
 
     echo "✅ 防火墙配置完成"
     echo "   已开放端口: SSH(22), HTTP(${FRONTEND_PORT}), API(${BACKEND_PORT})"
