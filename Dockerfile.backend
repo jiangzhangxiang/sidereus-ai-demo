@@ -16,7 +16,10 @@ RUN addgroup -g 1001 -S nestjs && \
     adduser -S nestjs -u 1001 -G nestjs
 COPY --from=builder /app/apps/backend/dist ./dist
 COPY --from=builder /app/apps/backend/package.json ./
-COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/pnpm-lock.yaml ./
+COPY --from=builder /app/pnpm-workspace.yaml ./
+RUN corepack enable && corepack prepare pnpm@10.32.1 --activate && \
+    pnpm install --prod --no-frozen-lockfile
 USER nestjs
 EXPOSE 3000
 CMD ["node", "dist/main"]
