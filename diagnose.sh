@@ -43,7 +43,7 @@ check_containers() {
     fi
     
     echo "   容器列表："
-    docker compose -f docker-compose.prod.yml ps -a 2>&1 || echo "   ⚠️  无法获取容器状态"
+    docker compose -f docker-compose.yml -f docker-compose.prod.yml ps -a 2>&1 || echo "   ⚠️  无法获取容器状态"
     
     echo ""
     echo "   详细状态："
@@ -171,12 +171,12 @@ show_fix_suggestions() {
     echo ""
     echo "  2. 重启后端服务："
     echo "     cd $PROJECT_DIR"
-    echo "     docker compose -f docker-compose.prod.yml restart backend"
+    echo "     docker compose -f docker-compose.yml -f docker-compose.prod.yml restart backend"
     echo ""
     echo "  3. 如果仍然失败，重建并启动："
     echo "     cd $PROJECT_DIR"
-    echo "     docker compose -f docker-compose.prod.yml down"
-    echo "     docker compose -f docker-compose.prod.yml up -d --build"
+    echo "     docker compose -f docker-compose.yml -f docker-compose.prod.yml down"
+    echo "     docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build"
     echo ""
     echo "  4. 完全重新部署："
     echo "     cd $PROJECT_DIR"
