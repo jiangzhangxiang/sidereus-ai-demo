@@ -203,6 +203,18 @@ pnpm lint                   # 代码检查
 
 # 共享包 (packages/shared)
 pnpm build                  # 构建 TypeScript 类型声明
+
+# Docker 容器管理（根目录）
+pnpm dev:docker             # 启动开发环境 Docker（docker-compose.dev.yml）
+pnpm dev:docker:build       # 构建并启动开发环境 Docker
+pnpm prod:docker            # 启动生产环境 Docker（docker-compose.prod.yml）
+pnpm prod:docker:build      # 构建并启动生产环境 Docker
+pnpm docker:stop            # 停止生产环境 Docker
+pnpm docker:logs            # 查看生产环境 Docker 日志（实时）
+pnpm docker:ps              # 查看 Docker 容器状态
+
+# 服务器部署（需设置 SERVER_IP 环境变量）
+pnpm prod:deploy            # 一键部署到服务器（打包 + 传输 + 构建启动）
 ```
 
 ## 前端路由

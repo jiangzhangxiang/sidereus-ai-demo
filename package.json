@@ -5,6 +5,14 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "dev:docker": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d",
+    "dev:docker:build": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build",
+    "prod:docker": "docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d",
+    "prod:docker:build": "docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build",
+    "prod:deploy": "scp -r ./apps deploy.sh docker-compose*.yml ${SERVER_IP}:/opt/demo && ssh ${SERVER_IP} 'cd /opt/demo && docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build'",
+    "docker:stop": "docker-compose -f docker-compose.yml -f docker-compose.prod.yml down",
+    "docker:logs": "docker-compose -f docker-compose.yml -f docker-compose.prod.yml logs -f",
+    "docker:ps": "docker-compose -f docker-compose.yml -f docker-compose.prod.yml ps",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
