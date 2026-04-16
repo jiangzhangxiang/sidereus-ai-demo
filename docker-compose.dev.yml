@@ -18,7 +18,6 @@
 #   重新构建: docker-compose -f docker-compose.yml -f docker-compose.dev.yml build --no-cache [service]
 # ============================================
 
-version: '3.8'
 
 services:
   # ============================================
@@ -130,5 +129,4 @@ volumes:
 
 networks:
   demo-network:
-    external: true
     name: ${COMPOSE_PROJECT_NAME:-demo}-network
