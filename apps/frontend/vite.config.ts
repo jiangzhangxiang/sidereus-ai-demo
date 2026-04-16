@@ -4,6 +4,14 @@ import path from 'path'
 
 export default defineConfig({
   plugins: [react()],
+  server: {
+    host: '0.0.0.0',
+    port: 5173,
+    strictPort: true,
+    hmr: {
+      clientPort: 5173,
+    },
+  },
   resolve: {
     alias: {
       '@demo/shared': path.resolve(__dirname, '../../packages/shared/src/index.ts'),

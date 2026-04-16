@@ -1,0 +1,41 @@
+# ============================================
+# 开发环境 - 后端服务 (NestJS)
+# 特点：热重载、调试支持、完整开发工具链
+# 用途：本地开发和调试
+# ============================================
+
+FROM node:20-alpine AS development
+
+WORKDIR /app
+
+# 设置环境变量
+ENV NODE_ENV=development \
+    PNPM_HOME="/root/.local/share/pnpm"
+
+# 将 pnpm 添加到 PATH
+ENV PATH="${PNPM_HOME}:${PATH}"
+
+# 配置并启用 pnpm（使用国内镜像源加速）
+RUN corepack enable && \
+    corepack prepare pnpm@10.32.1 --activate && \
+    pnpm config set registry https://registry.npmmirror.com
+
+# 复制依赖定义文件（利用 Docker 缓存）
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/backend/package.json ./apps/backend/
+COPY packages/shared/package.json ./packages/shared/
+
+# 安装所有依赖（包括 devDependencies）
+RUN pnpm install --frozen-lockfile
+
+# 复制完整的源代码
+COPY . .
+
+# 创建上传目录（用于文件上传功能）
+RUN mkdir -p /app/apps/backend/uploads
+
+# 暴露端口（NestJS 默认端口 + 调试端口）
+EXPOSE 3000 9229
+
+# 开发模式启动命令（支持热重载）
+CMD ["pnpm", "--filter", "backend", "start:dev"]

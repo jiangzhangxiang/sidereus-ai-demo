@@ -12,6 +12,7 @@ build/
 .nuxt/
 .vuepress/dist/
 .svelte-kit/
+dist-ssr/
 
 # Environment variables
 .env
@@ -47,6 +48,7 @@ junit.xml
 # Logs
 logs
 *.log
+lerna-debug.log*
 
 # Runtime data
 pids
@@ -111,6 +113,7 @@ temp/
 # Local development files
 *.local
 local.*
+test.txt
 
 # Database
 *.db

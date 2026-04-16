@@ -1,0 +1,134 @@
+# ============================================
+# Docker Compose - 开发环境配置
+# ============================================
+# 用途：本地开发、调试、热重载
+# 特点：
+#   - 源代码热重载（Volume 挂载）
+#   - 完整的开发工具链
+#   - 调试端口开放
+#   - 依赖缓存优化
+#
+# 启动命令:
+#   docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+#   或: ./dev-start.sh dev (Windows: dev-start.bat dev)
+#
+# 常用操作:
+#   查看日志: docker-compose -f docker-compose.yml -f docker-compose.dev.yml logs -f [service]
+#   进入容器: docker exec -it demo-dev-backend sh
+#   重新构建: docker-compose -f docker-compose.yml -f docker-compose.dev.yml build --no-cache [service]
+# ============================================
+
+version: '3.8'
+
+services:
+  # ============================================
+  # 后端服务（开发模式）
+  # ============================================
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend.dev
+      target: development
+    container_name: ${COMPOSE_PROJECT_NAME:-demo}-dev-backend
+    env_file:
+      - apps/backend/.env.local
+    environment:
+      NODE_ENV: development
+      DB_HOST: postgres
+      DB_PORT: 5432
+      PORT: 3000
+      # 开发模式特定配置
+      LOG_LEVEL: debug
+    ports:
+      - "${BACKEND_PORT:-3000}:3000"
+      - "9229:9229"  # Node.js 调试端口
+    volumes:
+      # 源代码热重载（使用 cached 策略提升性能）
+      - ./apps/backend/src:/app/apps/backend/src:cached
+      - ./apps/backend/package.json:/app/apps/backend/package.json:ro
+      - ./apps/backend/tsconfig.json:/app/apps/backend/tsconfig.json:ro
+      - ./apps/backend/nest-cli.json:/app/apps/backend/nest-cli.json:ro
+      # 共享包热重载
+      - ./packages/shared/src:/app/packages/shared/src:cached
+      - ./packages/shared/package.json:/app/packages/shared/package.json:ro
+      # node_modules 持久化（避免重复安装）
+      - backend_node_modules:/app/apps/backend/node_modules
+      - shared_node_modules:/app/packages/shared/node_modules
+      # 上传文件持久化
+      - backend_uploads:/app/apps/backend/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - demo-network
+    restart: unless-stopped
+    command: ["pnpm", "--filter", "backend", "start:dev"]
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1.5'
+        reservations:
+          memory: 512M
+
+  # ============================================
+  # 前端服务（开发模式）
+  # ============================================
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend.dev
+      target: development
+    container_name: ${COMPOSE_PROJECT_NAME:-demo}-dev-frontend
+    environment:
+      NODE_ENV: development
+      VITE_API_BASE_URL: http://localhost:${BACKEND_PORT:-3000}
+      CHOKIDAR_USEPOLLING: "true"  # Docker 环境下启用轮询以支持 HMR
+      WATCHPACK_POLLING: "true"    # Vite 5+ 的轮询配置
+    ports:
+      - "${FRONTEND_PORT:-5173}:5173"
+    volumes:
+      # 源代码热重载
+      - ./apps/frontend/src:/app/apps/frontend/src:cached
+      - ./apps/frontend/index.html:/app/apps/frontend/index.html:ro
+      - ./apps/frontend/public:/app/apps/frontend/public:cached
+      - ./apps/frontend/package.json:/app/apps/frontend/package.json:ro
+      - ./apps/frontend/vite.config.ts:/app/apps/frontend/vite.config.ts:ro
+      - ./apps/frontend/tsconfig.app.json:/app/apps/frontend/tsconfig.app.json:ro
+      - ./apps/frontend/tsconfig.node.json:/app/apps/frontend/tsconfig.node.json:ro
+      # 共享包热重载
+      - ./packages/shared/src:/app/packages/shared/src:cached
+      - ./packages/shared/package.json:/app/packages/shared/package.json:ro
+      # node_modules 持久化
+      - frontend_node_modules:/app/apps/frontend/node_modules
+      - shared_node_modules:/app/packages/shared/node_modules
+    depends_on:
+      - backend
+    networks:
+      - demo-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '1.0'
+        reservations:
+          memory: 256M
+
+# ============================================
+# 开发环境专用卷定义
+# ============================================
+volumes:
+  backend_node_modules:
+    driver: local
+  frontend_node_modules:
+    driver: local
+  shared_node_modules:
+    driver: local
+  backend_uploads:
+    driver: local
+
+networks:
+  demo-network:
+    external: true
+    name: ${COMPOSE_PROJECT_NAME:-demo}-network

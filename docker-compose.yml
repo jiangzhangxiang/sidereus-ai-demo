@@ -1,18 +1,59 @@
+# ============================================
+# Docker Compose 基础配置模板
+# ============================================
+# 此文件为项目的基础配置，包含公共服务定义
+# 实际使用时请根据环境选择对应的 compose 文件：
+#
+#   开发环境: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+#   生产环境: docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#
+# 快捷命令（使用提供的脚本）:
+#   Windows: dev-start.bat [dev|prod]
+#   Linux/Mac: ./dev-start.sh [dev|prod]
+# ============================================
+
 version: '3.8'
 
+# ============================================
+# 公共服务：PostgreSQL 数据库
+# ============================================
 services:
   postgres:
     image: postgres:15-alpine
-    container_name: demo-postgres
-    ports:
-      - '5432:5432'
+    container_name: ${COMPOSE_PROJECT_NAME:-demo}-postgres
+    restart: always
     environment:
-      POSTGRES_USER: demo
-      POSTGRES_PASSWORD: demo
-      POSTGRES_DB: demo
+      POSTGRES_USER: ${POSTGRES_USER:-demo}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-demo}
+      POSTGRES_DB: ${POSTGRES_DB:-demo}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "${DB_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-demo} -d ${POSTGRES_DB:-demo}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - demo-network
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
 
+# ============================================
+# 共享卷和网络定义
+# ============================================
 volumes:
   postgres_data:
+    driver: local
+
+networks:
+  demo-network:
+    driver: bridge
+    name: ${COMPOSE_PROJECT_NAME:-demo}-network

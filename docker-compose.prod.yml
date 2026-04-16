@@ -1,61 +1,132 @@
+# ============================================
+# Docker Compose - 生产环境配置
+# ============================================
+# 用途：生产部署、性能优化、安全加固
+# 特点：
+#   - 多阶段构建，最小化镜像体积
+#   - 非 root 用户运行（安全最佳实践）
+#   - 资源限制和健康检查
+#   - 自动重启策略
+#   - Nginx 反向代理 + Gzip 压缩
+#
+# 启动命令:
+#   docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#   或: ./deploy.sh (一键部署脚本)
+#
+# 部署前准备:
+#   1. 配置 apps/backend/.env.local 文件
+#   2. 设置 SERVER_IP 环境变量（或修改下方默认值）
+#   3. 确保 DB_PASSWORD 使用强密码
+# ============================================
+
 version: '3.8'
 
 services:
-  postgres:
-    image: postgres:15-alpine
-    container_name: demo-postgres
-    environment:
-      POSTGRES_USER: demo
-      POSTGRES_PASSWORD: demo_prod_2026
-      POSTGRES_DB: demo
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - demo-network
-    restart: always
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U demo"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
+  # ============================================
+  # 后端服务（生产模式）
+  # ============================================
   backend:
     build:
       context: .
-      dockerfile: Dockerfile.backend
-    container_name: demo-backend
+      dockerfile: Dockerfile.backend.prod
+      target: production
+      args:
+        NODE_ENV: production
+    container_name: ${COMPOSE_PROJECT_NAME:-demo}-backend
     env_file:
       - apps/backend/.env.local
     environment:
-      DB_HOST: postgres
       NODE_ENV: production
+      DB_HOST: postgres
+      DB_PORT: 5432
+      PORT: 3000
     ports:
-      - "3000:3000"
+      - "${BACKEND_PORT:-3000}:3000"
+    volumes:
+      # 仅持久化必要数据（上传文件）
+      - backend_uploads:/app/apps/backend/uploads
     depends_on:
       postgres:
         condition: service_healthy
     networks:
       - demo-network
     restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '1.0'
+        reservations:
+          memory: 256M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
+  # ============================================
+  # 前端服务（Nginx 静态资源服务）
+  # ============================================
   frontend:
     build:
       context: .
-      dockerfile: Dockerfile.frontend
+      dockerfile: Dockerfile.frontend.prod
+      target: production
       args:
-        VITE_API_BASE_URL: http://${SERVER_IP:-115.29.195.88}:3000
-    container_name: demo-frontend
+        VITE_API_BASE_URL: http://${SERVER_IP:-localhost}:${BACKEND_PORT:-3000}
+    container_name: ${COMPOSE_PROJECT_NAME:-demo}-frontend
+    environment:
+      NODE_ENV: production
     ports:
-      - "80:80"
+      - "${FRONTEND_PORT:-80}:80"
     depends_on:
       - backend
     networks:
       - demo-network
     restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: '0.5'
+        reservations:
+          memory: 64M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
+# ============================================
+# 生产环境专用卷定义
+# ============================================
 volumes:
-  postgres_data:
+  backend_uploads:
+    driver: local
 
 networks:
   demo-network:
-    driver: bridge
+    external: true
+    name: ${COMPOSE_PROJECT_NAME:-demo}-network
