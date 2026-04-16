@@ -2,8 +2,9 @@
  * @fileoverview 候选人列表页
  * @description 候选人管理的主页面，集成筛选栏、表格/卡片视图切换、分页控制、添加候选人弹窗，
  *              以及岗位选择和智能匹配分析功能。通过 Zustand Store 管理数据加载和筛选状态。
+ *              支持移动端响应式：顶部工具栏自适应布局、卡片视图单列显示、分页组件简化。
  * @module pages/Candidates/CandidateList
- * @version 1.0.0
+ * @version 1.1.0
  */
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -18,9 +19,11 @@ import MatchResultDrawer from '../../components/MatchResultDrawer';
 import { fetchJobs } from '../../api/jobs';
 import { analyzeMatch } from '../../api/match';
 import type { Job, MatchResult, Candidate, MatchRequest } from '@demo/shared';
+import useIsMobile from '../../hooks/useIsMobile';
 
 const CandidateList: React.FC = () => {
   const navigate = useNavigate();
+  const { isMobile } = useIsMobile();
   const [modalOpen, setModalOpen] = useState(false);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [selectedJobId, setSelectedJobId] = useState<string | undefined>();
@@ -115,23 +118,31 @@ const CandidateList: React.FC = () => {
   );
 
   return (
-    <div style={{ padding: '0 0 24px' }}>
+    <div style={{ padding: isMobile ? '0 0 16px' : '0 0 24px' }}>
+      {/* 顶部工具栏：岗位选择 + 操作按钮 */}
       <div
         style={{
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: 16,
+          alignItems: isMobile ? 'flex-start' : 'center',
+          marginBottom: isMobile ? 12 : 16,
           flexWrap: 'wrap',
-          gap: 12,
+          gap: isMobile ? 12 : 12,
+          flexDirection: isMobile ? 'column' : 'row',
         }}
       >
-        <Space wrap size="small">
+        <div style={{ 
+          width: isMobile ? '100%' : 'auto',
+          display: 'flex', 
+          alignItems: 'center', 
+          flexWrap: 'wrap',
+          gap: isMobile ? 8 : 'small'
+        }}>
           <span style={{ fontSize: 14, color: '#666' }}>选择岗位：</span>
           <Select
             value={selectedJobId}
             onChange={setSelectedJobId}
-            style={{ width: 200, minWidth: 150 }}
+            style={{ width: isMobile ? '100%' : 200, minWidth: isMobile ? '100%' : 150 }}
             placeholder="请选择要匹配的岗位"
             options={jobs.map((j) => ({ label: j.title, value: j.id }))}
           />
@@ -158,16 +169,16 @@ const CandidateList: React.FC = () => {
               新建岗位
             </Button>
           </Tooltip>
-        </Space>
-        <Space>
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => setModalOpen(true)}
-          >
-            添加候选人
-          </Button>
-        </Space>
+        </div>
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={() => setModalOpen(true)}
+          style={{ width: isMobile ? '100%' : 'auto' }}
+          block={isMobile}
+        >
+          添加候选人
+        </Button>
       </div>
 
       <FilterBar
@@ -202,9 +213,9 @@ const CandidateList: React.FC = () => {
           onMatch={doMatch}
         />
       ) : (
-        <Row gutter={[16, 16]}>
+        <Row gutter={[isMobile ? 12 : 16, isMobile ? 12 : 16]}>
           {pagedCandidates.map((candidate) => (
-            <Col xs={24} sm={12} lg={8} xl={6} key={candidate.id}>
+            <Col xs={24} sm={12} lg={isMobile ? 24 : 8} xl={isMobile ? 24 : 6} key={candidate.id}>
               <CandidateCard candidate={candidate} />
             </Col>
           ))}
@@ -214,7 +225,7 @@ const CandidateList: React.FC = () => {
       {total > 0 && (
         <div
           style={{
-            marginTop: 20,
+            marginTop: isMobile ? 16 : 20,
             display: 'flex',
             justifyContent: 'flex-end',
           }}
@@ -223,8 +234,10 @@ const CandidateList: React.FC = () => {
             current={currentPage}
             pageSize={pageSize}
             total={total}
-            showSizeChanger
-            showQuickJumper
+            size={isMobile ? 'small' : undefined}
+            showSizeChanger={!isMobile}
+            showQuickJumper={!isMobile}
+            simple={isMobile}
             showTotal={(t) => `共 ${t} 条记录`}
             pageSizeOptions={['5', '10', '20', '50']}
             onChange={(page, size) => {

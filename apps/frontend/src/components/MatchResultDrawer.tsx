@@ -5,8 +5,9 @@
  *              - 柱状图展示三个维度评分对比
  *              - 卡片式布局展示AI自然语言评语，支持文本复制
  *              支持加载状态、关闭操作和切换不同候选人的结果。
+ *              支持移动端响应式：移动端从底部滑出全屏显示，PC端右侧固定宽度抽屉。
  * @module components/MatchResultDrawer
- * @version 1.0.0
+ * @version 1.1.0
  */
 import React, { useState } from 'react';
 import {
@@ -26,6 +27,7 @@ import {
   LoadingOutlined,
 } from '@ant-design/icons';
 import type { MatchResult, Candidate, Job } from '@demo/shared';
+import useIsMobile from '../hooks/useIsMobile';
 
 const { Paragraph, Text, Title } = Typography;
 
@@ -74,6 +76,7 @@ const MatchResultDrawer: React.FC<MatchResultDrawerProps> = ({
   onClose,
 }) => {
   const [copied, setCopied] = useState(false);
+  const { isMobile } = useIsMobile();
 
   const handleCopyComment = () => {
     if (!result) return;
@@ -92,8 +95,9 @@ const MatchResultDrawer: React.FC<MatchResultDrawerProps> = ({
           {loading && <LoadingOutlined spin style={{ color: '#1677ff' }} />}
         </div>
       }
-      placement="right"
-      width={520}
+      placement={isMobile ? 'bottom' : 'right'}
+      width={isMobile ? '100%' : 520}
+      height={isMobile ? '80%' : undefined}
       open={open}
       onClose={onClose}
       closeIcon={<CloseOutlined />}
@@ -105,14 +109,14 @@ const MatchResultDrawer: React.FC<MatchResultDrawerProps> = ({
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            padding: '80px 0',
+            padding: isMobile ? '60px 0' : '80px 0',
           }}
         >
           <Spin size="large" />
-          <p style={{ marginTop: 16, color: '#999' }}>正在执行智能匹配分析...</p>
+          <p style={{ marginTop: 16, color: '#999', fontSize: isMobile ? 14 : undefined }}>正在执行智能匹配分析...</p>
         </div>
       ) : result ? (
-        <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        <Space direction="vertical" size={isMobile ? 'middle' : 'large'} style={{ width: '100%' }}>
           {/* 岗位与候选人信息 */}
           {job && (
             <Card size="small" title="岗位信息">
@@ -143,16 +147,16 @@ const MatchResultDrawer: React.FC<MatchResultDrawerProps> = ({
                 justifyContent: 'center',
                 alignItems: 'center',
                 flexDirection: 'column',
-                padding: '20px 0',
+                padding: isMobile ? '16px 0' : '20px 0',
               }}
             >
               <Progress
                 type="circle"
                 percent={result.overall_score}
                 strokeColor={getScoreColor(result.overall_score)}
-                size={160}
+                size={isMobile ? 120 : 160}
                 format={(percent) => (
-                  <span style={{ fontSize: 32, fontWeight: 700 }}>
+                  <span style={{ fontSize: isMobile ? 24 : 32, fontWeight: 700 }}>
                     {percent}
                   </span>
                 )}
@@ -160,9 +164,9 @@ const MatchResultDrawer: React.FC<MatchResultDrawerProps> = ({
               <Text
                 strong
                 style={{
-                  fontSize: 16,
+                  fontSize: isMobile ? 14 : 16,
                   color: getScoreColor(result.overall_score),
-                  marginTop: 12,
+                  marginTop: isMobile ? 8 : 12,
                 }}
               >
                 {getScoreLevel(result.overall_score)}
@@ -209,6 +213,8 @@ const MatchResultDrawer: React.FC<MatchResultDrawerProps> = ({
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
+                  flexWrap: 'wrap',
+                  gap: 8,
                 }}
               >
                 <span>AI 分析评语</span>
@@ -227,9 +233,10 @@ const MatchResultDrawer: React.FC<MatchResultDrawerProps> = ({
               style={{
                 whiteSpace: 'pre-line',
                 lineHeight: 1.8,
-                maxHeight: 300,
+                maxHeight: isMobile ? 200 : 300,
                 overflowY: 'auto',
                 margin: 0,
+                fontSize: isMobile ? 14 : undefined,
               }}
             >
               {result.comment}

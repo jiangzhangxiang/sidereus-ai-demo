@@ -2,8 +2,9 @@
  * @fileoverview 添加候选人弹窗组件
  * @description 模态对话框形式的候选人添加入口，集成 PDF 简历上传、SSE 流式解析、
  *              内联表单编辑和提交功能。支持手动输入或 AI 解析两种方式创建候选人记录。
+ *              支持移动端响应式：弹窗全屏显示、表单字段纵向排列、按钮尺寸适配。
  * @module pages/Candidates/AddCandidatesModal
- * @version 1.0.0
+ * @version 1.1.0
  */
 import React from 'react';
 import {
@@ -33,6 +34,7 @@ import {
 } from '../../api/upload';
 import { useCandidateStore } from '../../store/candidateStore';
 import type { Candidate } from '@demo/shared';
+import useIsMobile from '../../hooks/useIsMobile';
 
 const { TextArea } = Input;
 
@@ -48,6 +50,7 @@ const AddCandidatesModal: React.FC<AddCandidatesModalProps> = ({
   onClose,
 }) => {
   const { addCandidate } = useCandidateStore();
+  const { isMobile } = useIsMobile();
   const [currentStep, setCurrentStep] = React.useState<StepType>('upload');
   const [fileList, setFileList] = React.useState<any[]>([]);
   const [uploading, setUploading] = React.useState(false);
@@ -374,8 +377,17 @@ const AddCandidatesModal: React.FC<AddCandidatesModalProps> = ({
         </Card>
       )}
 
-      <div style={{ marginTop: 20, textAlign: 'right' }}>
-        <Button onClick={onClose} style={{ marginRight: 8 }}>
+      <div style={{ 
+        marginTop: isMobile ? 16 : 20, 
+        textAlign: 'right',
+        display: 'flex',
+        gap: 8,
+        flexDirection: isMobile ? 'column-reverse' : 'row'
+      }}>
+        <Button 
+          onClick={onClose} 
+          style={{ marginRight: isMobile ? 0 : 8, width: isMobile ? '100%' : 'auto' }}
+        >
           取消
         </Button>
         <Button
@@ -383,6 +395,7 @@ const AddCandidatesModal: React.FC<AddCandidatesModalProps> = ({
           onClick={handleUpload}
           loading={uploading}
           disabled={fileList.length === 0}
+          style={{ width: isMobile ? '100%' : 'auto' }}
         >
           开始解析
         </Button>
@@ -393,10 +406,14 @@ const AddCandidatesModal: React.FC<AddCandidatesModalProps> = ({
   const renderPreviewStep = () => (
     <div>
       {!uploadResults ? null : (
-        <div style={{ maxHeight: '60vh', overflowY: 'auto', paddingRight: 4 }}>
-          <h4 style={{ marginBottom: 12 }}>基本信息</h4>
-          <Space direction="vertical" style={{ width: '100%', marginBottom: 20 }} size="middle">
-            <div style={{ display: 'flex', gap: 12 }}>
+        <div style={{ maxHeight: isMobile ? '70vh' : '60vh', overflowY: 'auto', paddingRight: 4 }}>
+          <h4 style={{ marginBottom: isMobile ? 10 : 12, fontSize: isMobile ? 15 : undefined }}>基本信息</h4>
+          <Space direction="vertical" style={{ width: '100%', marginBottom: isMobile ? 16 : 20 }} size={isMobile ? 'small' : 'middle'}>
+            <div style={{ 
+              display: 'flex', 
+              gap: isMobile ? 8 : 12,
+              flexDirection: isMobile ? 'column' : 'row'
+            }}>
               <Input
                 placeholder="姓名"
                 value={uploadResults.basicInfo.name}
@@ -410,7 +427,11 @@ const AddCandidatesModal: React.FC<AddCandidatesModalProps> = ({
                 style={{ flex: 1 }}
               />
             </div>
-            <div style={{ display: 'flex', gap: 12 }}>
+            <div style={{ 
+              display: 'flex', 
+              gap: isMobile ? 8 : 12,
+              flexDirection: isMobile ? 'column' : 'row'
+            }}>
               <Input
                 placeholder="邮箱"
                 value={uploadResults.basicInfo.email}
@@ -426,7 +447,7 @@ const AddCandidatesModal: React.FC<AddCandidatesModalProps> = ({
             </div>
           </Space>
 
-          <h4 style={{ marginBottom: 12 }}>
+          <h4 style={{ marginBottom: isMobile ? 10 : 12, fontSize: isMobile ? 15 : undefined }}>
             教育经历
             <Button
               type="link"
@@ -444,8 +465,8 @@ const AddCandidatesModal: React.FC<AddCandidatesModalProps> = ({
               style={{
                 border: '1px solid #e8e8e8',
                 borderRadius: 8,
-                padding: 14,
-                marginBottom: 14,
+                padding: isMobile ? 12 : 14,
+                marginBottom: isMobile ? 12 : 14,
                 position: 'relative',
                 background: '#fafbfc',
               }}
@@ -454,15 +475,19 @@ const AddCandidatesModal: React.FC<AddCandidatesModalProps> = ({
                 onClick={() => removeEducation(index)}
                 style={{
                   position: 'absolute',
-                  top: 10,
-                  right: 10,
+                  top: isMobile ? 8 : 10,
+                  right: isMobile ? 8 : 10,
                   color: '#ff4d4f',
                   cursor: 'pointer',
-                  fontSize: 16,
+                  fontSize: isMobile ? 14 : 16,
                 }}
               />
               <Space direction="vertical" style={{ width: '100%' }} size="small">
-                <div style={{ display: 'flex', gap: 10 }}>
+                <div style={{ 
+                  display: 'flex', 
+                  gap: isMobile ? 8 : 10,
+                  flexDirection: isMobile ? 'column' : 'row'
+                }}>
                   <Input
                     placeholder="学校"
                     value={edu.school}
@@ -480,7 +505,11 @@ const AddCandidatesModal: React.FC<AddCandidatesModalProps> = ({
                     style={{ flex: 1 }}
                   />
                 </div>
-                <div style={{ display: 'flex', gap: 10 }}>
+                <div style={{ 
+                  display: 'flex', 
+                  gap: isMobile ? 8 : 10,
+                  flexDirection: isMobile ? 'column' : 'row'
+                }}>
                   <Input
                     placeholder="学历"
                     value={edu.degree}
@@ -506,7 +535,7 @@ const AddCandidatesModal: React.FC<AddCandidatesModalProps> = ({
             </div>
           ))}
 
-          <h4 style={{ marginBottom: 12, marginTop: 20 }}>
+          <h4 style={{ marginBottom: isMobile ? 10 : 12, marginTop: isMobile ? 16 : 20, fontSize: isMobile ? 15 : undefined }}>
             工作经历
             <Button
               type="link"
@@ -524,8 +553,8 @@ const AddCandidatesModal: React.FC<AddCandidatesModalProps> = ({
               style={{
                 border: '1px solid #e8e8e8',
                 borderRadius: 8,
-                padding: 14,
-                marginBottom: 14,
+                padding: isMobile ? 12 : 14,
+                marginBottom: isMobile ? 12 : 14,
                 position: 'relative',
                 background: '#fafbfc',
               }}
@@ -534,15 +563,19 @@ const AddCandidatesModal: React.FC<AddCandidatesModalProps> = ({
                 onClick={() => removeWorkExperience(index)}
                 style={{
                   position: 'absolute',
-                  top: 10,
-                  right: 10,
+                  top: isMobile ? 8 : 10,
+                  right: isMobile ? 8 : 10,
                   color: '#ff4d4f',
                   cursor: 'pointer',
-                  fontSize: 16,
+                  fontSize: isMobile ? 14 : 16,
                 }}
               />
               <Space direction="vertical" style={{ width: '100%' }} size="small">
-                <div style={{ display: 'flex', gap: 10 }}>
+                <div style={{ 
+                  display: 'flex', 
+                  gap: isMobile ? 8 : 10,
+                  flexDirection: isMobile ? 'column' : 'row'
+                }}>
                   <Input
                     placeholder="公司名称"
                     value={work.company}
@@ -591,7 +624,7 @@ const AddCandidatesModal: React.FC<AddCandidatesModalProps> = ({
             </div>
           ))}
 
-          <h4 style={{ marginBottom: 12, marginTop: 20 }}>
+          <h4 style={{ marginBottom: isMobile ? 10 : 12, marginTop: isMobile ? 16 : 20, fontSize: isMobile ? 15 : undefined }}>
             技能标签
             <Button
               type="link"
@@ -603,17 +636,22 @@ const AddCandidatesModal: React.FC<AddCandidatesModalProps> = ({
               添加
             </Button>
           </h4>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+          <div style={{ 
+            display: 'flex', 
+            flexWrap: 'wrap', 
+            gap: isMobile ? 8 : 10,
+            flexDirection: isMobile ? 'column' : 'row'
+          }}>
             {uploadResults.skills.map((skill, index) => (
               <div
                 key={index}
-                style={{ display: 'inline-flex', alignItems: 'center' }}
+                style={{ display: 'inline-flex', alignItems: 'center', width: isMobile ? '100%' : 'auto' }}
               >
                 <Input
                   placeholder="技能"
                   value={skill}
                   onChange={(e) => updateSkills(index, e.target.value)}
-                  style={{ width: 140 }}
+                  style={{ width: isMobile ? '100%' : 140, flex: isMobile ? 1 : 'none' }}
                 />
                 <MinusCircleOutlined
                   onClick={() => removeSkill(index)}
@@ -621,6 +659,7 @@ const AddCandidatesModal: React.FC<AddCandidatesModalProps> = ({
                     marginLeft: 6,
                     color: '#ff4d4f',
                     cursor: 'pointer',
+                    fontSize: isMobile ? 14 : undefined,
                   }}
                 />
               </div>
@@ -631,19 +670,26 @@ const AddCandidatesModal: React.FC<AddCandidatesModalProps> = ({
 
       <div
         style={{
-          marginTop: 20,
+          marginTop: isMobile ? 16 : 20,
           paddingTop: 16,
           borderTop: '1px solid #f0f0f0',
           textAlign: 'right',
+          display: 'flex',
+          gap: 8,
+          flexDirection: isMobile ? 'column-reverse' : 'row',
         }}
       >
         <Button
           onClick={() => setCurrentStep('upload')}
-          style={{ marginRight: 8 }}
+          style={{ marginRight: isMobile ? 0 : 8, width: isMobile ? '100%' : 'auto' }}
         >
           上一步
         </Button>
-        <Button type="primary" onClick={handleConfirm}>
+        <Button 
+          type="primary" 
+          onClick={handleConfirm} 
+          style={{ width: isMobile ? '100%' : 'auto' }}
+        >
           确认添加
         </Button>
       </div>
@@ -710,19 +756,24 @@ const AddCandidatesModal: React.FC<AddCandidatesModalProps> = ({
       }
       open={open}
       onCancel={onClose}
-      width={720}
+      width={isMobile ? '100%' : 720}
       footer={null}
       destroyOnClose
-      centered
+      centered={!isMobile}
       styles={{
-        body: { padding: '20px', maxHeight: '80vh', overflowY: 'auto' },
+        body: { 
+          padding: isMobile ? '16px' : '20px', 
+          maxHeight: isMobile ? '90vh' : '80vh', 
+          overflowY: 'auto' 
+        },
       }}
     >
       <Steps
         current={getStepIndex()}
         items={stepItems}
-        size="small"
-        style={{ marginBottom: 24 }}
+        size={isMobile ? 'small' : 'small'}
+        direction={isMobile ? 'horizontal' : 'horizontal'}
+        style={{ marginBottom: isMobile ? 16 : 24 }}
       />
 
       {currentStep === 'upload' && renderUploadStep()}

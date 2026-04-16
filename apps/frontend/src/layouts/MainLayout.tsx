@@ -15,31 +15,17 @@ import {
   UserOutlined,
   MenuOutlined,
 } from '@ant-design/icons';
+import useIsMobile from '../hooks/useIsMobile';
 
 const { Header, Sider, Content } = Layout;
 const { Title } = Typography;
-
-/** PC端断点阈值（像素） */
-const DESKTOP_BREAKPOINT = 992;
 
 /** 主布局组件：提供全局导航框架和页面容器 */
 const MainLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-
-  /** 监听窗口大小变化，判断是否为移动端 */
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < DESKTOP_BREAKPOINT);
-    };
-
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
+  const { isMobile } = useIsMobile();
 
   /** 当从移动端切换回PC端时关闭移动菜单 */
   useEffect(() => {
