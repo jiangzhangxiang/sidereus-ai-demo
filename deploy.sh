@@ -116,7 +116,7 @@ build_and_start() {
 
     cd "$PROJECT_DIR"
 
-    docker compose -f docker-compose.prod.yml build --no-cache
+    docker compose -f docker-compose.yml -f docker-compose.prod.yml build --no-cache
 
     echo "✅ Docker 镜像构建完成"
 }
@@ -127,7 +127,7 @@ start_services() {
 
     cd "$PROJECT_DIR"
 
-    docker compose -f docker-compose.prod.yml up -d
+    docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 
     echo "   等待服务启动..."
     sleep 10
@@ -137,14 +137,14 @@ start_services() {
 
     local all_healthy=true
 
-    if ! docker compose -f docker-compose.prod.yml ps | grep -q "Up"; then
+    if ! docker compose -f docker-compose.yml -f docker-compose.prod.yml ps | grep -q "Up"; then
         echo "❌ 服务启动失败"
         all_healthy=false
     fi
 
     echo ""
     echo "   📋 容器状态："
-    docker compose -f docker-compose.prod.yml ps
+    docker compose -f docker-compose.yml -f docker-compose.prod.yml ps
 
     echo ""
     echo "   🔍 检查后端服务..."
@@ -217,10 +217,10 @@ show_result() {
     echo "     后端: http://${SERVER_IP}:${BACKEND_PORT}"
     echo ""
     echo "  📋 常用命令:"
-    echo "     查看日志:   docker compose -f ${PROJECT_DIR}/docker-compose.prod.yml logs -f"
-    echo "     重启服务:   docker compose -f ${PROJECT_DIR}/docker-compose.prod.yml restart"
-    echo "     停止服务:   docker compose -f ${PROJECT_DIR}/docker-compose.prod.yml down"
-    echo "     更新部署:   cd ${PROJECT_DIR} && git pull && docker compose -f docker-compose.prod.yml up -d --build"
+    echo "     查看日志:   docker compose -f ${PROJECT_DIR}/docker-compose.yml -f ${PROJECT_DIR}/docker-compose.prod.yml logs -f"
+    echo "     重启服务:   docker compose -f ${PROJECT_DIR}/docker-compose.yml -f ${PROJECT_DIR}/docker-compose.prod.yml restart"
+    echo "     停止服务:   docker compose -f ${PROJECT_DIR}/docker-compose.yml -f ${PROJECT_DIR}/docker-compose.prod.yml down"
+    echo "     更新部署:   cd ${PROJECT_DIR} && git pull && docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build"
     echo ""
     echo "  ⚠️  注意事项:"
     echo "     1. 数据库密码已自动设置为 demo_prod_2026（测试用）"
