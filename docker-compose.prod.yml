@@ -127,5 +127,4 @@ volumes:
 
 networks:
   demo-network:
-    external: true
     name: ${COMPOSE_PROJECT_NAME:-demo}-network
