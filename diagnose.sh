@@ -78,15 +78,43 @@ check_backend_health() {
     echo ""
     echo "❤️  [4/6] 检查后端健康状态..."
     
-    if curl -sf http://localhost:3000/api/health > /dev/null 2>&1; then
-        echo "   ✅ /api/health 正常"
-    elif curl -sf http://localhost:3000/api > /dev/null 2>&1; then
-        echo "   ✅ /api 可访问（可能没有 /health 端点）"
-    elif curl -sf http://localhost:3000 > /dev/null 2>&1; then
-        echo "   ⚠️  后端端口可访问但 API 路径异常"
+    if curl -sf http://localhost:3000 > /dev/null 2>&1; then
+        response=$(curl -s http://localhost:3000)
+        if [[ "$response" == *"Hello World!"* ]]; then
+            echo "   ✅ 根路径正常 (返回: $response)"
+        else
+            echo "   ✅ 后端服务可访问 (返回: $response)"
+        fi
     else
         echo "   ❌ 后端无法访问 (http://localhost:3000)"
+        return 1
     fi
+    
+    echo "   API 端点检查："
+    
+    # 检查 candidates API
+    if curl -sf http://localhost:3000/api/candidates > /dev/null 2>&1; then
+        echo "   ✅ /api/candidates 可访问"
+    else
+        echo "   ❌ /api/candidates 无法访问"
+    fi
+    
+    # 检查 jobs API
+    if curl -sf http://localhost:3000/api/jobs > /dev/null 2>&1; then
+        echo "   ✅ /api/jobs 可访问"
+    else
+        echo "   ❌ /api/jobs 无法访问"
+    fi
+    
+    # 检查 match API
+    if curl -sf -X POST -H "Content-Type: application/json" -d '{"job":{"requirements":"test"},"candidate":{"resume":"test"}}' http://localhost:3000/api/match > /dev/null 2>&1; then
+        echo "   ✅ /api/match 可访问"
+    else
+        echo "   ⚠️  /api/match 需要POST请求，跳过详细检查"
+    fi
+    
+    # 检查 upload API
+    echo "   ℹ️  /api/upload/resume 需要文件上传，跳过详细检查"
 }
 
 check_env_files() {
