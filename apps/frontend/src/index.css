@@ -32,3 +32,62 @@ body {
 .ant-card:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
+
+@media screen and (max-width: 768px) {
+  body {
+    font-size: 14px;
+  }
+
+  .ant-table-wrapper {
+    overflow-x: auto;
+  }
+
+  .ant-table {
+    min-width: 600px;
+  }
+
+  .ant-descriptions-item-label {
+    width: 80px !important;
+    white-space: nowrap;
+  }
+
+  .ant-modal {
+    max-width: calc(100vw - 16px) !important;
+    margin: 8px !important;
+  }
+
+  .ant-modal-content {
+    padding: 0 !important;
+  }
+
+  .ant-drawer-wrapper-body {
+    overflow-x: hidden;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  body {
+    font-size: 13px;
+  }
+
+  .ant-card {
+    border-radius: 8px;
+  }
+
+  .ant-card-body {
+    padding: 16px !important;
+  }
+
+  .ant-btn {
+    font-size: 13px;
+  }
+
+  .ant-select {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .ant-input {
+    font-size: 14px;
+  }
+}

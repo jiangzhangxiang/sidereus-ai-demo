@@ -123,15 +123,15 @@ const CandidateList: React.FC = () => {
           alignItems: 'center',
           marginBottom: 16,
           flexWrap: 'wrap',
-          gap: 8,
+          gap: 12,
         }}
       >
-        <Space wrap>
+        <Space wrap size="small">
           <span style={{ fontSize: 14, color: '#666' }}>选择岗位：</span>
           <Select
             value={selectedJobId}
             onChange={setSelectedJobId}
-            style={{ width: 240 }}
+            style={{ width: 200, minWidth: 150 }}
             placeholder="请选择要匹配的岗位"
             options={jobs.map((j) => ({ label: j.title, value: j.id }))}
           />

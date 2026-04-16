@@ -33,29 +33,29 @@ const BasicInfoCard: React.FC<BasicInfoCardProps> = ({
       style={{
         background: '#fff',
         borderRadius: 12,
-        padding: '24px 28px',
+        padding: '20px 24px',
         boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
         <div
           style={{
-            width: 64,
-            height: 64,
+            width: 56,
+            height: 56,
             borderRadius: '50%',
             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             color: '#fff',
-            fontSize: 26,
+            fontSize: 22,
             fontWeight: 700,
           }}
         >
           {info.name.charAt(0)}
         </div>
-        <div style={{ flex: 1 }}>
-          <h2 style={{ margin: 0, fontSize: 24, fontWeight: 700 }}>
+        <div style={{ flex: 1, minWidth: 150 }}>
+          <h2 style={{ margin: 0, fontSize: 22, fontWeight: 700 }}>
             {info.name}
           </h2>
           <div style={{ marginTop: 6, color: '#666', fontSize: 14 }}>

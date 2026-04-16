@@ -174,6 +174,8 @@ const CandidateTable: React.FC<CandidateTableProps> = ({
         columns={columns}
         rowKey="id"
         pagination={false}
+        scroll={{ x: 'max-content' }}
+        size="middle"
       />
       <StatusChangeModal
         open={modalOpen}

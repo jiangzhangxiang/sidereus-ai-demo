@@ -89,7 +89,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
           value={searchKeyword}
           onChange={(e) => onSearchChange(e.target.value)}
           allowClear
-          style={{ width: 280 }}
+          style={{ width: 220, minWidth: 160, flex: '1 1 200px' }}
         />
 
         <Radio.Group
@@ -124,7 +124,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
           value={selectedStatuses}
           onChange={onStatusSelect}
           allowClear
-          style={{ width: 200 }}
+          style={{ width: 180, minWidth: 140, flex: '1 1 150px' }}
           maxTagCount={1}
           options={statusOptions.map(([value, label]) => ({
             value,
@@ -138,7 +138,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
           value={selectedSkills}
           onChange={onSkillSelect}
           allowClear
-          style={{ width: 240 }}
+          style={{ width: 200, minWidth: 160, flex: '1 1 170px' }}
           maxTagCount={2}
           options={allSkills.map((skill) => ({
             value: skill,
@@ -146,7 +146,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
           }))}
         />
 
-        <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           {hasActiveFilters && (
             <Button icon={<ClearOutlined />} onClick={onReset}>
               重置

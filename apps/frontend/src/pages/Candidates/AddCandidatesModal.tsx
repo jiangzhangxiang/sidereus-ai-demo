@@ -715,7 +715,7 @@ const AddCandidatesModal: React.FC<AddCandidatesModalProps> = ({
       destroyOnClose
       centered
       styles={{
-        body: { padding: '24px 24px 8px', maxHeight: '80vh', overflowY: 'auto' },
+        body: { padding: '20px', maxHeight: '80vh', overflowY: 'auto' },
       }}
     >
       <Steps

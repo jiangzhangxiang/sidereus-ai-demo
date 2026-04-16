@@ -131,7 +131,7 @@ const JobEdit: React.FC = () => {
         </Button>
       </div>
 
-      <Card title={isEdit ? '编辑岗位' : '新建岗位'} style={{ maxWidth: 800 }}>
+      <Card title={isEdit ? '编辑岗位' : '新建岗位'} style={{ maxWidth: 800, width: '100%' }}>
         <Form
           form={form}
           layout="vertical"

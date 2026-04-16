@@ -3,24 +3,50 @@
  * @description 应用的主框架布局，包含固定侧边栏导航、顶部标题栏和内容区域。
  *              使用 Ant Design Layout 组件构建，侧边栏包含系统 Logo 和菜单导航，
  *              内容区域通过 Outlet 渲染子路由页面。
+ *              支持响应式设计：PC端侧边栏常驻，移动端通过汉堡菜单控制侧边栏显隐。
  * @module layouts/MainLayout
- * @version 1.0.0
+ * @version 1.1.0
  */
-import React from 'react';
-import { Layout, Menu, Typography } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Layout, Menu, Typography, Button } from 'antd';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import {
   TeamOutlined,
   UserOutlined,
+  MenuOutlined,
 } from '@ant-design/icons';
 
 const { Header, Sider, Content } = Layout;
 const { Title } = Typography;
 
+/** PC端断点阈值（像素） */
+const DESKTOP_BREAKPOINT = 992;
+
 /** 主布局组件：提供全局导航框架和页面容器 */
 const MainLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  /** 监听窗口大小变化，判断是否为移动端 */
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < DESKTOP_BREAKPOINT);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  /** 当从移动端切换回PC端时关闭移动菜单 */
+  useEffect(() => {
+    if (!isMobile && mobileMenuOpen) {
+      setMobileMenuOpen(false);
+    }
+  }, [isMobile, mobileMenuOpen]);
 
   const menuItems = [
     {
@@ -38,8 +64,22 @@ const MainLayout: React.FC = () => {
     return location.pathname;
   };
 
+  /** 处理菜单点击事件：导航并关闭移动端菜单 */
+  const handleMenuClick = (key: string) => {
+    navigate(key);
+    if (isMobile) {
+      setMobileMenuOpen(false);
+    }
+  };
+
+  /** 切换移动端菜单显示状态 */
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
+
   return (
     <Layout style={{ minHeight: '100vh', background: '#f5f5f5' }}>
+      {/* 侧边栏 */}
       <Sider
         width={220}
         style={{
@@ -48,7 +88,11 @@ const MainLayout: React.FC = () => {
           left: 0,
           top: 0,
           bottom: 0,
-          zIndex: 100,
+          zIndex: isMobile && mobileMenuOpen ? 1001 : 100,
+          overflow: 'auto',
+          height: '100vh',
+          transition: isMobile ? 'transform 0.3s ease' : 'none',
+          transform: (isMobile && !mobileMenuOpen) ? 'translateX(-100%)' : 'translateX(0)',
         }}
       >
         <div
@@ -58,6 +102,7 @@ const MainLayout: React.FC = () => {
             alignItems: 'center',
             justifyContent: 'center',
             borderBottom: '1px solid rgba(255,255,255,0.1)',
+            padding: '0 16px',
           }}
         >
           <UserOutlined
@@ -81,7 +126,7 @@ const MainLayout: React.FC = () => {
           mode="inline"
           selectedKeys={[getSelectedKey()]}
           items={menuItems}
-          onClick={({ key }) => navigate(key)}
+          onClick={({ key }) => handleMenuClick(key)}
           style={{ marginTop: 8, borderRight: 0 }}
         />
 
@@ -100,7 +145,30 @@ const MainLayout: React.FC = () => {
         </div>
       </Sider>
 
-      <Layout style={{ marginLeft: 220 }}>
+      {/* 移动端遮罩层 */}
+      {isMobile && mobileMenuOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0,0,0,0.45)',
+            zIndex: 1000,
+          }}
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* 主内容区 */}
+      <Layout
+        style={{
+          marginLeft: isMobile ? 0 : 220,
+          transition: 'margin-left 0.2s ease',
+        }}
+        className="main-content"
+      >
         <Header
           style={{
             background: '#fff',
@@ -114,12 +182,26 @@ const MainLayout: React.FC = () => {
             zIndex: 99,
           }}
         >
-          <Title level={5} style={{ margin: 0, color: '#333' }}>
-            {menuItems.find((item) =>
-              location.pathname.startsWith(item.key.replace(/\/\w+$/, '')) ||
-              location.pathname === item.key,
-            )?.label || '候选人管理系统'}
-          </Title>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            {/* 汉堡菜单按钮：仅在移动端显示 */}
+            <Button
+              type="text"
+              icon={<MenuOutlined />}
+              onClick={toggleMobileMenu}
+              className="mobile-menu-btn"
+              style={{
+                display: isMobile ? 'block' : 'none',
+                fontSize: 18,
+                padding: '4px 8px',
+              }}
+            />
+            <Title level={5} style={{ margin: 0, color: '#333' }}>
+              {menuItems.find((item) =>
+                location.pathname.startsWith(item.key.replace(/\/\w+$/, '')) ||
+                location.pathname === item.key,
+              )?.label || '候选人管理系统'}
+            </Title>
+          </div>
         </Header>
 
         <Content

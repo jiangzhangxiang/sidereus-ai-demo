@@ -108,6 +108,8 @@ const CandidateDetail: React.FC = () => {
           alignItems: 'center',
           justifyContent: 'space-between',
           marginBottom: 20,
+          flexWrap: 'wrap',
+          gap: 12,
         }}
       >
         <Space>
@@ -123,7 +125,7 @@ const CandidateDetail: React.FC = () => {
         </Space>
       </div>
 
-      <Row gutter={[20, 20]}>
+      <Row gutter={[16, 20]}>
         <Col xs={24} lg={16}>
           <BasicInfoCard
             info={candidate.basicInfo}

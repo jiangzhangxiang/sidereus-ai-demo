@@ -52,7 +52,7 @@ const CandidateCard: React.FC<CandidateCardProps> = ({ candidate }) => {
         transition: 'all 0.3s ease',
         borderLeft: `4px solid ${getScoreColor(candidate.score)}`,
       }}
-      bodyStyle={{ padding: '20px' }}
+      bodyStyle={{ padding: '16px 20px' }}
       onClick={() => navigate(`/candidates/${candidate.id}`)}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
