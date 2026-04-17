@@ -23,28 +23,62 @@ check_root() {
 install_dependencies() {
     echo "📦 [1/6] 安装系统依赖..."
 
-    apt-get update -qq
-
-    apt-get install -y -qq \
-        curl \
-        git \
-        ca-certificates \
-        gnupg \
-        ufw > /dev/null 2>&1
-
-    if ! command -v docker &> /dev/null; then
-        install -m 0755 -d /etc/apt/keyrings
-        curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/debian/gpg -o /etc/apt/keyrings/docker.asc || \
-        curl -fsSL https://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/debian/gpg -o /etc/apt/keyrings/docker.asc || \
-        curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
-        chmod a+r /etc/apt/keyrings/docker.asc
-        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://mirrors.aliyun.com/docker-ce/linux/debian $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
-        apt-get update -qq > /dev/null 2>&1
-        apt-get install -y -qq docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin > /dev/null 2>&1
+    echo "   → apt-get update..."
+    if ! apt-get update -qq > /dev/null 2>&1; then
+        echo "❌ 失败: apt-get update 执行失败"
+        exit 1
     fi
 
-    systemctl enable docker > /dev/null 2>&1
-    systemctl start docker > /dev/null 2>&1
+    echo "   → 安装基础依赖 (curl, git, ca-certificates, gnupg, ufw)..."
+    if ! apt-get install -y -qq curl git ca-certificates gnupg ufw > /dev/null 2>&1; then
+        echo "❌ 失败: 安装基础依赖失败"
+        exit 1
+    fi
+
+    if ! command -v docker &> /dev/null; then
+        echo "   → Docker 未安装，开始安装..."
+
+        echo "   → 创建 GPG 密钥目录..."
+        if ! install -m 0755 -d /etc/apt/keyrings; then
+            echo "❌ 失败: 创建 /etc/apt/keyrings 目录失败"
+            exit 1
+        fi
+
+        echo "   → 下载 Docker GPG 密钥..."
+        if ! curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/debian/gpg -o /etc/apt/keyrings/docker.asc; then
+            echo "   → 阿里云镜像失败，尝试清华镜像..."
+            if ! curl -fsSL https://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/debian/gpg -o /etc/apt/keyrings/docker.asc; then
+                echo "   → 清华镜像失败，尝试官方源..."
+                if ! curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc; then
+                    echo "❌ 失败: 所有 Docker GPG 密钥源均无法访问 (网络问题?)"
+                    exit 1
+                fi
+            fi
+        fi
+        chmod a+r /etc/apt/keyrings/docker.asc
+
+        echo "   → 添加 Docker APT 软件源..."
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://mirrors.aliyun.com/docker-ce/linux/debian $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+        echo "   → apt-get update (Docker 源)..."
+        if ! apt-get update -qq > /dev/null 2>&1; then
+            echo "❌ 失败: apt-get update (含 Docker 源) 执行失败"
+            exit 1
+        fi
+
+        echo "   → 安装 Docker CE..."
+        if ! apt-get install -y -qq docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin > /dev/null 2>&1; then
+            echo "❌ 失败: Docker CE 安装失败 (可能源地址不匹配当前系统版本)"
+            echo "   当前系统: $(cat /etc/os-release | grep PRETTY_NAME)"
+            exit 1
+        fi
+    else
+        echo "   → Docker 已安装，跳过"
+    fi
+
+    echo "   → 启用 Docker 服务..."
+    systemctl enable docker > /dev/null 2>&1 || { echo "❌ 失败: systemctl enable docker"; exit 1; }
+    systemctl start docker > /dev/null 2>&1 || { echo "❌ 失败: systemctl start docker"; exit 1; }
 
     echo "✅ 系统依赖安装完成"
 }
