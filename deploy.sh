@@ -21,7 +21,6 @@ check_root() {
 }
 
 install_dependencies() {
-    echo ""
     echo "📦 [1/6] 安装系统依赖..."
 
     apt-get update -qq
@@ -34,11 +33,6 @@ install_dependencies() {
         ufw > /dev/null 2>&1
 
     if ! command -v docker &> /dev/null; then
-        echo "   安装 Docker（使用阿里云镜像源）..."
-        install -m 0755 -d /etc/apt/keyrings
-        curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-        chmod a+r /etc/apt/keyrings/docker.gpg
-        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://mirrors.aliyun.com/docker-ce/linux/ubuntu $(. /etc/os-release && echo $VERSION_CODENAME) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
         apt-get update -qq > /dev/null 2>&1
         apt-get install -y -qq docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin > /dev/null 2>&1
     fi
@@ -50,17 +44,14 @@ install_dependencies() {
 }
 
 clone_project() {
-    echo ""
     echo "📂 [2/6] 克隆项目代码..."
 
     if [ -d "$PROJECT_DIR" ]; then
-        echo "   项目已存在，正在更新..."
         cd "$PROJECT_DIR"
         git fetch origin main
         git reset --hard origin/main
         git clean -fd
     else
-        echo "   正在克隆项目..."
         git clone "$GIT_REPO" "$PROJECT_DIR"
         cd "$PROJECT_DIR"
     fi
@@ -69,8 +60,7 @@ clone_project() {
 }
 
 configure_docker_mirror() {
-    echo ""
-    echo "🐳 [3.5/6] 配置 Docker 镜像加速和 UFW 兼容..."
+    echo "🐳 [3.5/6] 配置 Docker 镜像加速..."
 
     mkdir -p /etc/docker
 
@@ -86,11 +76,10 @@ EOF
 
     systemctl restart docker > /dev/null 2>&1
 
-    echo "✅ Docker 配置完成（已启用 UFW 兼容模式）"
+    echo "✅ Docker 配置完成"
 }
 
 configure_env() {
-    echo ""
     echo "⚙️  [3/6] 配置环境变量..."
 
     # 设置数据库环境变量
@@ -113,107 +102,78 @@ configure_env() {
     fi
 
     echo "✅ 环境变量配置完成"
-    echo "   前端地址: http://${SERVER_IP}:${FRONTEND_PORT}"
-    echo "   后端地址: http://${SERVER_IP}:${BACKEND_PORT}"
 }
 
 build_and_start() {
-    echo ""
     echo "🔨 [4/6] 构建 Docker 镜像..."
 
     cd "$PROJECT_DIR"
 
     # 停止所有容器并移除旧的数据库卷，确保数据库正确初始化
-    echo "   停止并移除旧容器..."
     docker compose -f docker-compose.yml -f docker-compose.prod.yml down
-    echo "   移除旧数据库卷..."
     docker volume rm -f demo_postgres_data 2>/dev/null || true
 
-    echo "   构建 Docker 镜像..."
     docker compose -f docker-compose.yml -f docker-compose.prod.yml build --no-cache
 
     echo "✅ Docker 镜像构建完成"
 }
 
 start_services() {
-    echo ""
     echo "🚀 [5/6] 启动服务..."
 
     cd "$PROJECT_DIR"
 
-    echo "   启动服务容器..."
     docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 
-    echo "   等待服务启动..."
     sleep 15
-
-    echo ""
-    echo "   📊 检查服务状态..."
 
     local all_healthy=true
 
-    echo ""
-    echo "   📋 容器状态："
-    docker compose -f docker-compose.yml -f docker-compose.prod.yml ps
-
-    echo ""
-    echo "   🔍 检查数据库服务..."
+    # 检查数据库服务
     local postgres_status=$(docker inspect --format='{{.State.Status}}' demo-postgres 2>/dev/null || echo "not_found")
-    if [ "$postgres_status" = "running" ]; then
-        echo "   ✅ 数据库容器运行中"
-        echo "   📝 数据库日志（最近 20 行）："
-        docker logs --tail 20 demo-postgres 2>&1
-    else
-        echo "   ❌ 数据库容器状态: $postgres_status"
-        echo "   📝 数据库日志："
-        docker logs demo-postgres 2>&1 | tail -50
+    if [ "$postgres_status" != "running" ]; then
+        echo "❌ 数据库容器状态: $postgres_status"
         all_healthy=false
     fi
 
-    echo ""
-    echo "   🔍 检查后端服务..."
-
+    # 检查后端服务
     local backend_status=$(docker inspect --format='{{.State.Status}}' demo-backend 2>/dev/null || echo "not_found")
-
     if [ "$backend_status" = "running" ]; then
-        echo "   ✅ 后端容器运行中"
-        echo "   📝 后端日志（最近 30 行）："
-        docker logs --tail 30 demo-backend 2>&1
-
         sleep 5
-        if curl -sf http://localhost:${BACKEND_PORT}/api/health > /dev/null 2>&1 || \
-           curl -sf http://localhost:${BACKEND_PORT}/api > /dev/null 2>&1 || \
-           curl -sf http://localhost:${BACKEND_PORT} > /dev/null 2>&1; then
-            echo "   ✅ 后端 API 可访问 (端口 ${BACKEND_PORT})"
-        else
-            echo "   ⚠️  后端 API 暂时无法访问，等待初始化..."
+        if ! curl -sf http://localhost:${BACKEND_PORT}/api/health > /dev/null 2>&1 && \
+           ! curl -sf http://localhost:${BACKEND_PORT}/api > /dev/null 2>&1 && \
+           ! curl -sf http://localhost:${BACKEND_PORT} > /dev/null 2>&1; then
             sleep 10
-            if curl -sf http://localhost:${BACKEND_PORT}/api > /dev/null 2>&1; then
-                echo "   ✅ 后端 API 现在可访问"
-            else
-                echo "   ❌ 后端 API 仍然无法访问"
+            if ! curl -sf http://localhost:${BACKEND_PORT}/api > /dev/null 2>&1; then
+                echo "❌ 后端 API 无法访问"
                 all_healthy=false
             fi
         fi
     else
-        echo "   ❌ 后端容器状态: $backend_status"
-        echo "   📝 后端日志："
-        docker logs demo-backend 2>&1 | tail -50
+        echo "❌ 后端容器状态: $backend_status"
         all_healthy=false
     fi
 
     if [ "$all_healthy" = true ]; then
-        echo ""
         echo "✅ 所有服务启动成功"
     else
-        echo ""
-        echo "❌ 部分服务启动失败，请检查上方日志"
+        echo "❌ 部分服务启动失败，请检查日志"
+        # 仅在失败时输出日志
+        echo "容器状态："
+        docker compose -f docker-compose.yml -f docker-compose.prod.yml ps
+        if [ "$postgres_status" != "running" ]; then
+            echo "数据库日志："
+            docker logs demo-postgres 2>&1 | tail -30
+        fi
+        if [ "$backend_status" != "running" ]; then
+            echo "后端日志："
+            docker logs demo-backend 2>&1 | tail -30
+        fi
         exit 1
     fi
 }
 
 setup_firewall() {
-    echo ""
     echo "🔒 [6/6] 配置防火墙..."
 
     ufw default deny incoming > /dev/null 2>&1
@@ -225,7 +185,6 @@ setup_firewall() {
     echo "y" | ufw enable > /dev/null 2>&1
 
     echo "✅ 防火墙配置完成"
-    echo "   已开放端口: SSH(22), HTTP(${FRONTEND_PORT}), API(${BACKEND_PORT})"
 }
 
 show_result() {
