@@ -11,8 +11,8 @@ const c = new Client({
   password: process.env.DB_PASSWORD || 'demo_prod_2026',
   database: process.env.DB_DATABASE || 'demo',
 });
-c.connect().then(() => { c.end(); process.exit(0); }).catch(() => { process.exit(1); });
-" 2>/dev/null; do
+c.connect().then(() => { c.end(); process.exit(0); }).catch((err) => { console.error('连接错误:', err.message); process.exit(1); });
+"; do
   echo "   ⏳ 数据库未就绪，等待重试..."
   sleep 2
 done

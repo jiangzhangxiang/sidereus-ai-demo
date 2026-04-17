@@ -124,9 +124,12 @@ build_and_start() {
     cd "$PROJECT_DIR"
 
     # 停止所有容器并移除旧的数据库卷，确保数据库正确初始化
+    echo "   停止并移除旧容器..."
     docker compose -f docker-compose.yml -f docker-compose.prod.yml down
+    echo "   移除旧数据库卷..."
     docker volume rm -f demo_postgres_data 2>/dev/null || true
 
+    echo "   构建 Docker 镜像..."
     docker compose -f docker-compose.yml -f docker-compose.prod.yml build --no-cache
 
     echo "✅ Docker 镜像构建完成"
@@ -138,24 +141,34 @@ start_services() {
 
     cd "$PROJECT_DIR"
 
+    echo "   启动服务容器..."
     docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 
     echo "   等待服务启动..."
-    sleep 10
+    sleep 15
 
     echo ""
     echo "   📊 检查服务状态..."
 
     local all_healthy=true
 
-    if ! docker compose -f docker-compose.yml -f docker-compose.prod.yml ps | grep -q "Up"; then
-        echo "❌ 服务启动失败"
-        all_healthy=false
-    fi
-
     echo ""
     echo "   📋 容器状态："
     docker compose -f docker-compose.yml -f docker-compose.prod.yml ps
+
+    echo ""
+    echo "   🔍 检查数据库服务..."
+    local postgres_status=$(docker inspect --format='{{.State.Status}}' demo-postgres 2>/dev/null || echo "not_found")
+    if [ "$postgres_status" = "running" ]; then
+        echo "   ✅ 数据库容器运行中"
+        echo "   📝 数据库日志（最近 20 行）："
+        docker logs --tail 20 demo-postgres 2>&1
+    else
+        echo "   ❌ 数据库容器状态: $postgres_status"
+        echo "   📝 数据库日志："
+        docker logs demo-postgres 2>&1 | tail -50
+        all_healthy=false
+    fi
 
     echo ""
     echo "   🔍 检查后端服务..."
@@ -164,6 +177,8 @@ start_services() {
 
     if [ "$backend_status" = "running" ]; then
         echo "   ✅ 后端容器运行中"
+        echo "   📝 后端日志（最近 30 行）："
+        docker logs --tail 30 demo-backend 2>&1
 
         sleep 5
         if curl -sf http://localhost:${BACKEND_PORT}/api/health > /dev/null 2>&1 || \
@@ -177,15 +192,11 @@ start_services() {
                 echo "   ✅ 后端 API 现在可访问"
             else
                 echo "   ❌ 后端 API 仍然无法访问"
-                echo ""
-                echo "   📝 后端日志（最近 30 行）："
-                docker logs --tail 30 demo-backend 2>&1
                 all_healthy=false
             fi
         fi
     else
         echo "   ❌ 后端容器状态: $backend_status"
-        echo ""
         echo "   📝 后端日志："
         docker logs demo-backend 2>&1 | tail -50
         all_healthy=false
