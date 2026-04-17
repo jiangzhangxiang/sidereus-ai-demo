@@ -8,7 +8,7 @@ const c = new Client({
   host: process.env.DB_HOST || 'postgres',
   port: parseInt(process.env.DB_PORT || '5432'),
   user: process.env.DB_USERNAME || 'demo',
-  password: process.env.DB_PASSWORD,
+  password: process.env.DB_PASSWORD || 'demo_prod_2026',
   database: process.env.DB_DATABASE || 'demo',
 });
 c.connect().then(() => { c.end(); process.exit(0); }).catch(() => { process.exit(1); });
@@ -32,7 +32,7 @@ const ds = new DataSource({
   host: process.env.DB_HOST || 'postgres',
   port: parseInt(process.env.DB_PORT || '5432'),
   username: process.env.DB_USERNAME || 'demo',
-  password: process.env.DB_PASSWORD,
+  password: process.env.DB_PASSWORD || 'demo_prod_2026',
   database: process.env.DB_DATABASE || 'demo',
   entities: [Candidate, Education, WorkExperience, Job],
   synchronize: true,
