@@ -26,8 +26,8 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-demo}
       POSTGRES_DB: ${POSTGRES_DB:-demo}
       PGDATA: /var/lib/postgresql/data/pgdata
-    ports:
-      - "${DB_PORT:-5432}:5432"
+    # 端口映射：开发环境在 docker-compose.dev.yml 中配置
+    # 生产环境不暴露数据库端口到宿主机（安全考虑）
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:

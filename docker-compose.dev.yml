@@ -21,6 +21,13 @@
 
 services:
   # ============================================
+  # 数据库服务（开发模式 - 暴露端口用于调试）
+  # ============================================
+  postgres:
+    ports:
+      - "${DB_PORT:-5432}:5432"
+
+  # ============================================
   # 后端服务（开发模式）
   # ============================================
   backend:
@@ -61,7 +68,7 @@ services:
     networks:
       - demo-network
     restart: unless-stopped
-    command: ["pnpm", "--filter", "backend", "start:dev"]
+    command: ["sh", "-c", "pnpm --filter backend start:dev"]
     deploy:
       resources:
         limits:

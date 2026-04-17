@@ -109,9 +109,16 @@ build_and_start() {
 
     cd "$PROJECT_DIR"
 
-    # 停止所有容器并移除旧的数据库卷，确保数据库正确初始化
+    # 停止所有容器（保留数据库卷以保护数据）
     docker compose -f docker-compose.yml -f docker-compose.prod.yml down
-    docker volume rm -f demo_postgres_data 2>/dev/null || true
+
+    # 检查是否首次部署（无 postgres_data 卷）
+    if ! docker volume inspect demo_postgres_data &> /dev/null; then
+        echo "📝 首次部署：将创建新的数据库卷"
+    else
+        echo "📝 更新部署：保留现有数据库数据"
+        echo "   ⚠️  如需重置数据库，请手动执行: docker volume rm -f demo_postgres_data"
+    fi
 
     docker compose -f docker-compose.yml -f docker-compose.prod.yml build --no-cache
 
