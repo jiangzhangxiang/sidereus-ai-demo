@@ -93,9 +93,16 @@ configure_env() {
     echo ""
     echo "⚙️  [3/6] 配置环境变量..."
 
+    # 设置数据库环境变量
+    export POSTGRES_USER="demo"
+    export POSTGRES_PASSWORD="demo_prod_2026"
+    export POSTGRES_DB="demo"
+
     if [ ! -f "$PROJECT_DIR/apps/backend/.env.local" ]; then
         cp "$PROJECT_DIR/apps/backend/.env.production.template" "$PROJECT_DIR/apps/backend/.env.local"
         sed -i "s|DB_PASSWORD=.*|DB_PASSWORD=demo_prod_2026|" "$PROJECT_DIR/apps/backend/.env.local"
+        sed -i "s|DB_USERNAME=.*|DB_USERNAME=demo|" "$PROJECT_DIR/apps/backend/.env.local"
+        sed -i "s|DB_DATABASE=.*|DB_DATABASE=demo|" "$PROJECT_DIR/apps/backend/.env.local"
         sed -i "s|CORS_ORIGIN=.*|CORS_ORIGIN=http://${SERVER_IP}:${FRONTEND_PORT}|" "$PROJECT_DIR/apps/backend/.env.local"
         sed -i "s|DB_HOST=localhost|DB_HOST=postgres|" "$PROJECT_DIR/apps/backend/.env.local"
     fi
@@ -115,6 +122,10 @@ build_and_start() {
     echo "🔨 [4/6] 构建 Docker 镜像..."
 
     cd "$PROJECT_DIR"
+
+    # 停止所有容器并移除旧的数据库卷，确保数据库正确初始化
+    docker compose -f docker-compose.yml -f docker-compose.prod.yml down
+    docker volume rm -f demo_postgres_data 2>/dev/null || true
 
     docker compose -f docker-compose.yml -f docker-compose.prod.yml build --no-cache
 
