@@ -107,13 +107,34 @@ install_docker() {
     apt-get update -qq
     apt-get install -y -qq curl git ca-certificates gnupg
 
-    # 安装 Docker 官方源
+    # 检测操作系统类型（Debian 或 Ubuntu）
+    local os_id="$(. /etc/os-release && echo "$ID")"
+    local os_codename="$(. /etc/os-release && echo "$VERSION_CODENAME")"
+    log INFO "检测到系统: ${os_id} (${os_codename})"
+
+    # 根据系统选择对应的 Docker 源
+    local docker_repo_url=""
+    case "$os_id" in
+        ubuntu)
+            docker_repo_url="https://mirrors.aliyun.com/docker-ce/linux/ubuntu"
+            ;;
+        debian)
+            docker_repo_url="https://mirrors.aliyun.com/docker-ce/linux/debian"
+            ;;
+        *)
+            log WARNING "未知系统 (${os_id})，使用 Docker 官方源"
+            docker_repo_url="https://download.docker.com/linux/${os_id}"
+            ;;
+    esac
+
+    # 安装 GPG 密钥
     install -m 0755 -d /etc/apt/keyrings
-    curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
+    curl -fsSL "${docker_repo_url}/gpg" -o /etc/apt/keyrings/docker.asc
     chmod a+r /etc/apt/keyrings/docker.asc
 
+    # 添加 Docker 软件源（使用阿里云镜像加速）
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] \
-        https://download.docker.com/linux/debian $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+        ${docker_repo_url} ${os_codename} stable" | \
         tee /etc/apt/sources.list.d/docker.list > /dev/null
 
     apt-get update -qq
