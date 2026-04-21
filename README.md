@@ -55,7 +55,7 @@ demo/
 |------|------|------|
 | React | 19 | UI 框架 |
 | TypeScript | ~6.0 | 类型安全 |
-| Vite | 8 | 构建工具 |
+| Vite | 5 | 构建工具 |
 | React Router | 7 | 路由管理 |
 | Zustand | 5 | 状态管理 |
 | Ant Design | 6 | UI 组件库 |
