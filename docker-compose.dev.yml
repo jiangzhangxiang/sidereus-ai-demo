@@ -37,7 +37,7 @@ services:
       target: development
     container_name: ${COMPOSE_PROJECT_NAME:-demo}-dev-backend
     env_file:
-      - apps/backend/.env.local
+      - apps/backend/.env.dev
     environment:
       NODE_ENV: development
       DB_HOST: postgres

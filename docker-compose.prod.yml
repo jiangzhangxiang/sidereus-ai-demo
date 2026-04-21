@@ -54,7 +54,7 @@ services:
         NODE_ENV: production
     container_name: ${COMPOSE_PROJECT_NAME:-demo}-backend
     env_file:
-      - apps/backend/.env.local
+      - apps/backend/.env.prod
     environment:
       NODE_ENV: production
       DB_HOST: postgres
