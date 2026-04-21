@@ -265,7 +265,7 @@ validate_inputs() {
         ((issues++))
     fi
 
-    if [ ! "$ENVIRONMENT" =~ ^(development|staging|production)$ ]; then
+    if [[ ! "$ENVIRONMENT" =~ ^(development|staging|production)$ ]]; then
         log ERROR "不支持的环境: $ENVIRONMENT (支持: development|staging|production)"
         ((issues++))
     fi
