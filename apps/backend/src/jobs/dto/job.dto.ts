@@ -9,15 +9,15 @@ import {
 export class CreateJobDto {
   @IsString()
   @MaxLength(50)
-  title: string;
+  title!: string;
 
   @IsString()
-  description: string;
+  description!: string;
 
   @IsArray()
   @IsString({ each: true })
   @ArrayMinSize(1)
-  required_skills: string[];
+  required_skills!: string[];
 
   @IsOptional()
   @IsArray()

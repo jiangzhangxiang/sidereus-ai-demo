@@ -19,23 +19,23 @@ import { Candidate } from './candidate.entity';
 export class WorkExperience {
   /** 工作经历记录唯一标识（UUID） */
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   /** 公司名称 */
   @Column()
-  company: string;
+  company!: string;
 
   /** 职位名称 */
   @Column()
-  position: string;
+  position!: string;
 
   /** 工作时间段（如：2022-07 至今） */
   @Column()
-  period: string;
+  period!: string;
 
   /** 工作内容描述 */
   @Column()
-  description: string;
+  description!: string;
 
   /** 关联的候选人（序列化时排除，避免循环引用） */
   @Exclude()
@@ -43,5 +43,5 @@ export class WorkExperience {
     onDelete: 'CASCADE',
   })
   @JoinColumn()
-  candidate: Candidate;
+  candidate!: Candidate;
 }

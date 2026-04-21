@@ -83,9 +83,10 @@ export class ResumeParserService {
 
       const aiResponse = response.data.choices[0].message.content;
       return this.parseAIResponse(aiResponse);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('解析简历失败:', error);
-      throw new Error(`解析简历失败: ${error.message || '未知错误'}`);
+      const message = error instanceof Error ? error.message : '未知错误';
+      throw new Error(`解析简历失败: ${message}`);
     }
   }
 

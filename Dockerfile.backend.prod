@@ -25,15 +25,18 @@ COPY apps/backend/package.json ./apps/backend/
 COPY packages/shared/package.json ./packages/shared/
 
 # 安装依赖（生产模式）
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --shamefully-hoist
 
 # 复制源代码并构建
 COPY . .
 
+# 创建符号链接，解决 NestJS CLI 在 pnpm workspace 中的路径解析问题
+RUN ln -sf /app/node_modules/@nestjs/cli /app/apps/backend/node_modules/@nestjs/cli
+
 # 设置构建时环境变量并执行构建
 ARG VITE_API_BASE_URL
-RUN pnpm --filter shared build && \
-    pnpm --filter backend build
+RUN pnpm -w exec tsc --project packages/shared/tsconfig.json && \
+    cd /app/apps/backend && npx nest build
 
 # 在后端目录安装生产依赖并提升到顶层（解决 pnpm 符号链接问题）
 WORKDIR /app/apps/backend

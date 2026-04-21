@@ -17,29 +17,29 @@ import {
 export class Job {
   /** 岗位唯一标识（UUID） */
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   /** 岗位名称（最大50字符） */
   @Column({ length: 50 })
-  title: string;
+  title!: string;
 
   /** 岗位描述（富文本/Markdown格式） */
   @Column({ type: 'text' })
-  description: string;
+  description!: string;
 
   /** 必备技能列表（PostgreSQL 文本数组，至少1项） */
   @Column('text', { array: true, default: [] })
-  required_skills: string[];
+  required_skills!: string[];
 
   /** 加分技能列表（PostgreSQL 文本数组，可选） */
   @Column('text', { array: true, default: [] })
-  plus_skills: string[];
+  plus_skills!: string[];
 
   /** 创建时间（自动生成） */
   @CreateDateColumn()
-  created_at: Date;
+  created_at!: Date;
 
   /** 最后更新时间（自动更新） */
   @UpdateDateColumn()
-  updated_at: Date;
+  updated_at!: Date;
 }

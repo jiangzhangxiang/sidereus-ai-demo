@@ -16,6 +16,7 @@
     "prod:stop": "docker-compose -f docker-compose.yml -f docker-compose.prod.yml down",
     "prod:logs": "docker-compose -f docker-compose.yml -f docker-compose.prod.yml logs -f",
     "prod:ps": "docker-compose -f docker-compose.yml -f docker-compose.prod.yml ps",
+    "db:sync": "docker exec -i demo-postgres psql -U demo -d demo < database/schema.sql",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -23,8 +24,11 @@
   "license": "ISC",
   "packageManager": "pnpm@10.32.1",
   "devDependencies": {
+    "@nestjs/cli": "^11.0.0",
     "@nestjs/core": "^11.1.18",
     "@types/jest": "^30.0.0",
-    "@types/node": "^25.5.2"
+    "@types/node": "^25.5.2",
+    "typescript": "^6.0.2",
+    "vite": "^5.4.11"
   }
 }

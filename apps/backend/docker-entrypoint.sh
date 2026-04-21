@@ -32,7 +32,7 @@ require('reflect-metadata');
 const { DataSource } = require('typeorm');
 const { Candidate } = require('./dist/candidates/candidate.entity');
 const { Education } = require('./dist/candidates/education.entity');
-const { WorkExperience } = require('./dist/work-experience.entity');
+const { WorkExperience } = require('./dist/candidates/work-experience.entity');
 const { Job } = require('./dist/jobs/job.entity');
 
 const ds = new DataSource({

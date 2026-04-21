@@ -21,10 +21,13 @@ COPY apps/frontend/package.json ./apps/frontend/
 COPY packages/shared/package.json ./packages/shared/
 
 # 安装依赖
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --shamefully-hoist
 
 # 复制源代码
 COPY . .
+
+# 创建符号链接，解决 Vite CLI 在 pnpm workspace 中的路径解析问题
+RUN ln -sf /app/node_modules/vite /app/apps/frontend/node_modules/vite
 
 # 复制生产环境变量文件（如果存在）
 COPY apps/frontend/.env.prod* ./apps/frontend/
@@ -34,8 +37,8 @@ ARG VITE_API_BASE_URL=http://localhost:3000
 ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 
 # 执行构建（先构建 shared 包，再构建 frontend）
-RUN pnpm --filter shared build && \
-    pnpm --filter frontend build
+RUN pnpm -w exec tsc --project packages/shared/tsconfig.json && \
+    cd /app/apps/frontend && npx vite build
 
 # ---------- 生产运行阶段（Nginx）----------
 FROM nginx:1.25-alpine AS production

@@ -21,64 +21,64 @@ import { Type } from 'class-transformer';
 /** 基本信息数据传输对象 */
 export class BasicInfoDto {
   @IsString()
-  name: string;
+  name!: string;
 
   @IsString()
-  phone: string;
+  phone!: string;
 
   @IsString()
-  email: string;
+  email!: string;
 
   @IsString()
-  city: string;
+  city!: string;
 }
 
 /** 教育经历数据传输对象 */
 export class EducationDto {
   @IsString()
-  school: string;
+  school!: string;
 
   @IsString()
-  major: string;
+  major!: string;
 
   @IsString()
-  degree: string;
+  degree!: string;
 
   @IsString()
-  graduationDate: string;
+  graduationDate!: string;
 }
 
 /** 工作经历数据传输对象 */
 export class WorkExperienceDto {
   @IsString()
-  company: string;
+  company!: string;
 
   @IsString()
-  position: string;
+  position!: string;
 
   @IsString()
-  period: string;
+  period!: string;
 
   @IsString()
-  description: string;
+  description!: string;
 }
 
 /** 评分明细数据传输对象 */
 export class ScoreBreakdownDto {
   @IsNumber()
-  technicalSkills: number;
+  technicalSkills!: number;
 
   @IsNumber()
-  experience: number;
+  experience!: number;
 
   @IsNumber()
-  education: number;
+  education!: number;
 
   @IsNumber()
-  communication: number;
+  communication!: number;
 
   @IsNumber()
-  potential: number;
+  potential!: number;
 }
 
 /** 创建候选人请求体数据传输对象 */
@@ -86,7 +86,7 @@ export class CreateCandidateDto {
   /** 基本信息（必填，嵌套验证） */
   @ValidateNested()
   @Type(() => BasicInfoDto)
-  basicInfo: BasicInfoDto;
+  basicInfo!: BasicInfoDto;
 
   /** 教育经历列表（可选） */
   @IsOptional()
@@ -126,7 +126,7 @@ export class CreateCandidateDto {
 
   /** 简历文件 URL（必填） */
   @IsString()
-  resumeUrl: string;
+  resumeUrl!: string;
 
   /** 备注信息（可选） */
   @IsOptional()

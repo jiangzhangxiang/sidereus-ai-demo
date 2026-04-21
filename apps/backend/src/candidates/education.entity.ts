@@ -19,23 +19,23 @@ import { Candidate } from './candidate.entity';
 export class Education {
   /** 教育记录唯一标识（UUID） */
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   /** 毕业院校名称 */
   @Column()
-  school: string;
+  school!: string;
 
   /** 专业名称 */
   @Column()
-  major: string;
+  major!: string;
 
   /** 学历层次（如：本科、硕士、博士） */
   @Column()
-  degree: string;
+  degree!: string;
 
   /** 毕业时间（格式：YYYY-MM） */
   @Column()
-  graduationDate: string;
+  graduationDate!: string;
 
   /** 关联的候选人（序列化时排除，避免循环引用） */
   @Exclude()
@@ -43,5 +43,5 @@ export class Education {
     onDelete: 'CASCADE',
   })
   @JoinColumn()
-  candidate: Candidate;
+  candidate!: Candidate;
 }

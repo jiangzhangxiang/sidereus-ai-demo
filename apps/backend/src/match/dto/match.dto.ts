@@ -8,13 +8,13 @@ import { Type } from 'class-transformer';
 
 export class MatchJobDto {
   @IsString()
-  title: string;
+  title!: string;
 
   @IsString()
-  description: string;
+  description!: string;
 
   @IsString({ each: true })
-  required_skills: string[];
+  required_skills!: string[];
 
   @IsOptional()
   @IsString({ each: true })
@@ -23,7 +23,7 @@ export class MatchJobDto {
 
 export class MatchCandidateDto {
   @IsObject()
-  basicInfo: Record<string, string>;
+  basicInfo!: Record<string, string>;
 
   @IsOptional()
   skills?: string[];
@@ -38,9 +38,9 @@ export class MatchCandidateDto {
 export class MatchRequestDto {
   @ValidateNested()
   @Type(() => MatchJobDto)
-  job: MatchJobDto;
+  job!: MatchJobDto;
 
   @ValidateNested()
   @Type(() => MatchCandidateDto)
-  candidate: MatchCandidateDto;
+  candidate!: MatchCandidateDto;
 }
